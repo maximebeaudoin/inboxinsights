@@ -20,6 +20,7 @@ export interface MoodEntry {
   activity?: string;
   emotions?: string;
   from?: string;
+  original_text?: string;
 }
 
 async function getMoodEntries(viewMode: 'personal' | 'global' = 'personal'): Promise<MoodEntry[]> {

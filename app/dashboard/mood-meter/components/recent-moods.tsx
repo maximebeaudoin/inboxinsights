@@ -1,9 +1,18 @@
 'use client';
 
 import { format, formatDistanceToNow } from 'date-fns';
-import { Info } from 'lucide-react';
+import { FileText, Info } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import type { MoodEntry } from '../page';
@@ -11,6 +20,13 @@ import type { MoodEntry } from '../page';
 interface RecentMoodsProps {
   moodEntries: MoodEntry[];
 }
+
+// Utility function to escape HTML entities for XSS protection
+const escapeHtml = (text: string): string => {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+};
 
 const moodEmojis = {
   1: '😢',
@@ -84,6 +100,91 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                       {moodLabels[entry.mood_score as keyof typeof moodLabels]}
                     </Badge>
                     <div className="flex items-center gap-1">
+                      {/* Raw Data Sheet */}
+                      <Sheet>
+                        <SheetTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 text-muted-foreground hover:text-foreground"
+                          >
+                            <FileText className="h-3 w-3" />
+                          </Button>
+                        </SheetTrigger>
+                        <SheetContent className="w-[400px] sm:w-[540px]">
+                          <SheetHeader>
+                            <SheetTitle>Raw Entry Data</SheetTitle>
+                            <SheetDescription>
+                              Original text and raw data for this mood entry
+                            </SheetDescription>
+                          </SheetHeader>
+                          <div className="mt-6 space-y-4">
+                            {/* Original Text */}
+                            {entry.original_text && (
+                              <div>
+                                <h4 className="text-sm font-medium mb-2">Original Text</h4>
+                                <div className="bg-muted p-3 rounded-md border">
+                                  <pre className="text-sm whitespace-pre-wrap break-words">
+                                    {escapeHtml(entry.original_text)}
+                                  </pre>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Raw Data Fields */}
+                            <div>
+                              <h4 className="text-sm font-medium mb-2">Raw Data</h4>
+                              <div className="space-y-2 text-sm">
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">ID:</span>
+                                  <span className="font-mono text-xs">{entry.id}</span>
+                                </div>
+                                {entry.email_entry_id && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Email Entry ID:</span>
+                                    <span className="font-mono text-xs">
+                                      {entry.email_entry_id}
+                                    </span>
+                                  </div>
+                                )}
+                                {entry.user_email && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">User Email:</span>
+                                    <span className="font-mono text-xs">{entry.user_email}</span>
+                                  </div>
+                                )}
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">From:</span>
+                                  <span className="font-mono text-xs">
+                                    {entry.from || 'Unknown'}
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Date Occurred:</span>
+                                  <span className="font-mono text-xs">{entry.date_occurred}</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Created At:</span>
+                                  <span className="font-mono text-xs">{entry.created_at}</span>
+                                </div>
+                                {entry.activity && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Activity:</span>
+                                    <span className="text-xs">{escapeHtml(entry.activity)}</span>
+                                  </div>
+                                )}
+                                {entry.emotions && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Emotions:</span>
+                                    <span className="text-xs">{escapeHtml(entry.emotions)}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </SheetContent>
+                      </Sheet>
+
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
