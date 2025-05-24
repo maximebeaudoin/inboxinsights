@@ -9,10 +9,7 @@
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [
-        0,
-        80
-      ],
+      "position": [0, 80],
       "id": "195f6da3-4844-48e6-b3a0-2050b7098312",
       "name": "Webhook",
       "webhookId": "f12fc46a-945f-48c0-84d0-8884ea0eecf6"
@@ -47,9 +44,7 @@
             "from_name": "={{ $('Webhook').item.json.body.FromName }}",
             "subject": "={{ $('Webhook').item.json.body.Subject }}"
           },
-          "matchingColumns": [
-            "email_entry_id"
-          ],
+          "matchingColumns": ["email_entry_id"],
           "schema": [
             {
               "id": "id",
@@ -195,10 +190,7 @@
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
-      "position": [
-        600,
-        80
-      ],
+      "position": [600, 80],
       "id": "f96b22b1-6267-44fc-8ea3-b0faad22c7be",
       "name": "Mood Table Insert",
       "credentials": {
@@ -229,10 +221,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
-      "position": [
-        220,
-        80
-      ],
+      "position": [220, 80],
       "id": "9426a325-3c28-450a-b218-e7a8f475586e",
       "name": "Aura Agent",
       "credentials": {
@@ -268,10 +257,7 @@
       },
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
-      "position": [
-        300,
-        300
-      ],
+      "position": [300, 300],
       "id": "2228bba8-579f-43a4-9b01-3217f936362a",
       "name": "Postgres",
       "credentials": {

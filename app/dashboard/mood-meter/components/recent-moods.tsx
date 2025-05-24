@@ -271,46 +271,62 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                     )}
                   </div>
 
-                  {/* Activity */}
-                  {entry.activity && (
-                    <div className="space-y-1">
-                      <div className="flex items-start gap-2">
-                        <span className="text-sm font-medium text-muted-foreground flex-shrink-0">
-                          🏃 Activity:
-                        </span>
-                      </div>
-                      <div className="pl-6">
-                        <p className="text-sm text-foreground leading-relaxed">{entry.activity}</p>
-                      </div>
-                    </div>
-                  )}
+                  {/* Chat Conversation */}
+                  {(entry.activity || entry.note) && (
+                    <div className="space-y-3 pl-6">
+                      {/* User Message */}
+                      {entry.activity && (
+                        <div className="flex items-start gap-3">
+                          {/* Avatar */}
+                          <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center border border-gray-300 dark:border-gray-600">
+                            <span className="text-sm">👤</span>
+                          </div>
 
-                  {/* AI Insight */}
-                  {entry.note && (
-                    <div className="space-y-2">
-                      <div className="flex items-start gap-3">
-                        {/* Avatar */}
-                        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center border border-gray-300 dark:border-gray-600">
-                          <span className="text-sm">🤖</span>
-                        </div>
-
-                        {/* Chat bubble */}
-                        <div className="flex-1 max-w-[85%]">
-                          <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 border border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
-                                Aura
-                              </span>
-                              <span className="text-xs text-gray-400 dark:text-gray-500">
-                                AI Assistant
-                              </span>
+                          {/* Chat bubble */}
+                          <div className="flex-1 max-w-[85%]">
+                            <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 border border-gray-200 dark:border-gray-700">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
+                                  {entry.from_name || entry.from || 'User'}
+                                </span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">
+                                  Message Resume
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
+                                {entry.activity}
+                              </p>
                             </div>
-                            <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
-                              {entry.note}
-                            </p>
                           </div>
                         </div>
-                      </div>
+                      )}
+
+                      {/* Aura Response */}
+                      {entry.note && (
+                        <div className="flex items-start gap-3">
+                          {/* Avatar */}
+                          <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center border border-gray-300 dark:border-gray-600">
+                            <span className="text-sm">🤖</span>
+                          </div>
+
+                          {/* Chat bubble */}
+                          <div className="flex-1 max-w-[85%]">
+                            <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 border border-gray-200 dark:border-gray-700">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
+                                  Aura
+                                </span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">
+                                  AI Assistant
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
+                                {entry.note}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
