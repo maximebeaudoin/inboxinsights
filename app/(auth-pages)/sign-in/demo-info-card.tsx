@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { Check, Copy, ExternalLink, Info, Key, Mail, Send } from 'lucide-react';
+import { ExternalLink, Info, Key, Mail, Send } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,19 +11,31 @@ import { Label } from '@/components/ui/label';
 
 import { useToast } from '@/hooks/use-toast';
 
-function CopyButton({ text, label }: { text: string; label: string }) {
-  const [copied, setCopied] = useState(false);
+function ClickableInput({
+  value,
+  label,
+  id,
+  type = 'text',
+  className = '',
+}: {
+  value: string;
+  label: string;
+  id: string;
+  type?: string;
+  className?: string;
+}) {
   const { toast } = useToast();
 
-  const handleCopy = async () => {
+  const handleClick = async (e: React.MouseEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    input.select();
+
     try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
+      await navigator.clipboard.writeText(value);
       toast({
         title: 'Copied!',
         description: `${label} copied to clipboard`,
       });
-      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast({
         title: 'Failed to copy',
@@ -34,15 +46,14 @@ function CopyButton({ text, label }: { text: string; label: string }) {
   };
 
   return (
-    <Button
-      type="button"
-      size="icon"
-      variant="outline"
-      onClick={handleCopy}
-      className="h-8 w-8 shrink-0"
-    >
-      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-    </Button>
+    <Input
+      id={id}
+      type={type}
+      value={value}
+      readOnly
+      onClick={handleClick}
+      className={`cursor-pointer ${className}`}
+    />
   );
 }
 
@@ -72,15 +83,12 @@ export function DemoInfoCard() {
                 <Mail className="h-3 w-3" />
                 Demo Email
               </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="demo-email"
-                  value="demo@example.com"
-                  disabled
-                  className="flex-1 text-sm"
-                />
-                <CopyButton text="demo@example.com" label="Demo email" />
-              </div>
+              <ClickableInput
+                id="demo-email"
+                value="demo@example.com"
+                label="Demo email"
+                className="text-sm"
+              />
             </div>
 
             <div className="space-y-2">
@@ -88,16 +96,13 @@ export function DemoInfoCard() {
                 <Key className="h-3 w-3" />
                 Demo Password
               </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="demo-password"
-                  type="password"
-                  value="demopassword123"
-                  disabled
-                  className="flex-1 text-sm"
-                />
-                <CopyButton text="demopassword123" label="Demo password" />
-              </div>
+              <ClickableInput
+                id="demo-password"
+                type="password"
+                value="demopassword123"
+                label="Demo password"
+                className="text-sm"
+              />
             </div>
           </div>
         </div>
@@ -114,18 +119,12 @@ export function DemoInfoCard() {
               <Mail className="h-3 w-3" />
               Send Data To
             </Label>
-            <div className="flex gap-2">
-              <Input
-                id="data-email"
-                value="b82ba9d30ef2dd7cf65016dfe8c69b37@inbound.postmarkapp.com"
-                disabled
-                className="flex-1 text-xs"
-              />
-              <CopyButton
-                text="b82ba9d30ef2dd7cf65016dfe8c69b37@inbound.postmarkapp.com"
-                label="Data email"
-              />
-            </div>
+            <ClickableInput
+              id="data-email"
+              value="b82ba9d30ef2dd7cf65016dfe8c69b37@inbound.postmarkapp.com"
+              label="Data email"
+              className="text-xs"
+            />
             <p className="text-xs text-blue-600 dark:text-blue-400">
               Send your data to this email address for processing
             </p>
@@ -133,32 +132,40 @@ export function DemoInfoCard() {
         </div>
 
         {/* GitHub Repository Section */}
-        <div className="space-y-2">
-          <Label className="flex items-center gap-2 text-xs">
-            <ExternalLink className="h-3 w-3" />
+        <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
+          <h3 className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
+            <ExternalLink className="h-4 w-4" />
             GitHub Repository
-          </Label>
-          <div className="flex gap-2">
-            <Input
-              value="https://github.com/maximebeaudoin/inboxinsights"
-              disabled
-              className="flex-1 text-xs"
-            />
-            <Button
-              type="button"
-              size="icon"
-              variant="outline"
-              onClick={() =>
-                window.open('https://github.com/maximebeaudoin/inboxinsights', '_blank')
-              }
-              className="h-8 w-8 shrink-0 hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
-              <ExternalLink className="h-4 w-4" />
-            </Button>
+          </h3>
+
+          <div className="space-y-2">
+            <Label htmlFor="github-repo" className="flex items-center gap-2 text-xs">
+              <ExternalLink className="h-3 w-3" />
+              Repository URL
+            </Label>
+            <div className="flex gap-2">
+              <ClickableInput
+                id="github-repo"
+                value="https://github.com/maximebeaudoin/inboxinsights"
+                label="GitHub repository URL"
+                className="flex-1 text-xs"
+              />
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                onClick={() =>
+                  window.open('https://github.com/maximebeaudoin/inboxinsights', '_blank')
+                }
+                className="h-8 w-8 shrink-0 hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              View the source code and contribute to the project
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground">
-            View the source code and contribute to the project
-          </p>
         </div>
       </CardContent>
     </Card>
