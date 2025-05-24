@@ -243,10 +243,10 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                   {/* Unified Badge Section */}
                   <div className="flex flex-wrap gap-2 pt-1">
                     {/* Mood badge - always first */}
-                    <Badge className={getMoodColor(entry.mood_score)}>
+                    <span className={`px-3 py-1.5 rounded-full text-xs font-medium border ${getMoodColor(entry.mood_score)}`}>
                       {entry.mood_score}/10 -{' '}
                       {moodLabels[entry.mood_score as keyof typeof moodLabels]}
-                    </Badge>
+                    </span>
 
                     {/* Additional metrics */}
                     {entry.energy_level && (
