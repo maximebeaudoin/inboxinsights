@@ -111,7 +111,7 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                             <FileText className="h-3 w-3" />
                           </Button>
                         </SheetTrigger>
-                        <SheetContent className="w-[400px] sm:w-[540px]">
+                        <SheetContent className="w-[500px] sm:w-[500px] sm:max-w-[500px]">
                           <SheetHeader>
                             <SheetTitle>Raw Entry Data</SheetTitle>
                             <SheetDescription>
