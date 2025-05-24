@@ -23,9 +23,13 @@ interface RecentMoodsProps {
 
 // Utility function to escape HTML entities for XSS protection
 const escapeHtml = (text: string): string => {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+  // Server-side safe HTML escaping
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 };
 
 const moodEmojis = {
