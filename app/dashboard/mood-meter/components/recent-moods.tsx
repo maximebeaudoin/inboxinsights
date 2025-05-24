@@ -95,144 +95,140 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
 
             {/* Content */}
             <div className="flex-1 min-w-0 pb-6">
-              <div className="bg-card rounded-lg border p-5 shadow-sm hover:shadow-md transition-all duration-200 hover:border-border/80">
+              <div className="bg-card rounded-lg border p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-border/80">
                 <div className="space-y-4">
-                  {/* Header with mood and time */}
+                  {/* Header with time and raw data button */}
                   <div className="flex items-center justify-between gap-2">
-                    <Badge className={getMoodColor(entry.mood_score)}>
-                      {entry.mood_score}/10 -{' '}
-                      {moodLabels[entry.mood_score as keyof typeof moodLabels]}
-                    </Badge>
-                    <div className="flex items-center gap-1">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="text-sm text-muted-foreground font-medium cursor-help">
-                              {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{format(new Date(entry.created_at), "EEEE, MMMM do, yyyy 'at' h:mm a")}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      {/* Raw Data Sheet */}
-                      <Sheet>
-                        <SheetTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 text-muted-foreground hover:text-foreground"
-                          >
-                            <FileText className="h-3 w-3" />
-                          </Button>
-                        </SheetTrigger>
-                        <SheetContent className="w-[500px] sm:w-[700px] sm:max-w-[700px] overflow-y-auto">
-                          <SheetHeader>
-                            <SheetTitle>Raw Entry Data</SheetTitle>
-                            <SheetDescription>
-                              Original text and raw data for this mood entry
-                            </SheetDescription>
-                          </SheetHeader>
-                          <div className="mt-6 space-y-4">
-                            {/* Original Text */}
-                            {entry.original_text && (
-                              <div>
-                                <h4 className="text-sm font-medium mb-2">Original Text</h4>
-                                <div className="bg-muted p-3 rounded-md border">
-                                  <pre className="text-sm whitespace-pre-wrap break-words">
-                                    {escapeHtml(entry.original_text)}
-                                  </pre>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Raw Data Fields */}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="text-sm text-muted-foreground font-medium cursor-help">
+                            {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{format(new Date(entry.created_at), "EEEE, MMMM do, yyyy 'at' h:mm a")}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    {/* Raw Data Sheet */}
+                    <Sheet>
+                      <SheetTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-auto p-0 text-muted-foreground hover:text-foreground text-xs p-2"
+                        >
+                          Show Raw Data
+                          <FileText className="h-3 w-3" />
+                        </Button>
+                      </SheetTrigger>
+                      <SheetContent className="w-[500px] sm:w-[700px] sm:max-w-[700px] overflow-y-auto">
+                        <SheetHeader>
+                          <SheetTitle>Raw Entry Data</SheetTitle>
+                          <SheetDescription>
+                            Original text and raw data for this mood entry
+                          </SheetDescription>
+                        </SheetHeader>
+                        <div className="mt-6 space-y-4">
+                          {/* Original Text */}
+                          {entry.original_text && (
                             <div>
-                              <h4 className="text-sm font-medium mb-2">Raw Data</h4>
-                              <div className="space-y-2 text-sm">
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">ID:</span>
-                                  <span className="font-mono text-xs">{entry.id}</span>
-                                </div>
-                                {entry.email_entry_id && (
-                                  <div className="grid grid-cols-2 gap-2">
-                                    <span className="font-medium">Email Entry ID:</span>
-                                    <span className="font-mono text-xs">
-                                      {entry.email_entry_id}
-                                    </span>
-                                  </div>
-                                )}
-                                {entry.user_email && (
-                                  <div className="grid grid-cols-2 gap-2">
-                                    <span className="font-medium">User Email:</span>
-                                    <span className="font-mono text-xs">{entry.user_email}</span>
-                                  </div>
-                                )}
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">From:</span>
-                                  <span className="font-mono text-xs">
-                                    {entry.from || 'Unknown'}
-                                  </span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Date Occurred:</span>
-                                  <span className="font-mono text-xs">{entry.date_occurred}</span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Created At:</span>
-                                  <span className="font-mono text-xs">{entry.created_at}</span>
-                                </div>
-                                {entry.activity && (
-                                  <div className="grid grid-cols-2 gap-2">
-                                    <span className="font-medium">Activity:</span>
-                                    <span className="text-xs">{escapeHtml(entry.activity)}</span>
-                                  </div>
-                                )}
-                                {entry.emotions && (
-                                  <div className="grid grid-cols-2 gap-2">
-                                    <span className="font-medium">Emotions:</span>
-                                    <span className="text-xs">{escapeHtml(entry.emotions)}</span>
-                                  </div>
-                                )}
+                              <h4 className="text-sm font-medium mb-2">Original Text</h4>
+                              <div className="bg-muted p-3 rounded-md border">
+                                <pre className="text-sm whitespace-pre-wrap break-words">
+                                  {escapeHtml(entry.original_text)}
+                                </pre>
                               </div>
                             </div>
+                          )}
+
+                          {/* Raw Data Fields */}
+                          <div>
+                            <h4 className="text-sm font-medium mb-2">Raw Data</h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="grid grid-cols-2 gap-2">
+                                <span className="font-medium">ID:</span>
+                                <span className="font-mono text-xs">{entry.id}</span>
+                              </div>
+                              {entry.email_entry_id && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Email Entry ID:</span>
+                                  <span className="font-mono text-xs">
+                                    {entry.email_entry_id}
+                                  </span>
+                                </div>
+                              )}
+                              {entry.user_email && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">User Email:</span>
+                                  <span className="font-mono text-xs">{entry.user_email}</span>
+                                </div>
+                              )}
+                              <div className="grid grid-cols-2 gap-2">
+                                <span className="font-medium">From:</span>
+                                <span className="font-mono text-xs">
+                                  {entry.from || 'Unknown'}
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <span className="font-medium">Date Occurred:</span>
+                                <span className="font-mono text-xs">{entry.date_occurred}</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <span className="font-medium">Created At:</span>
+                                <span className="font-mono text-xs">{entry.created_at}</span>
+                              </div>
+                              {entry.activity && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Activity:</span>
+                                  <span className="text-xs">{escapeHtml(entry.activity)}</span>
+                                </div>
+                              )}
+                              {entry.emotions && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Emotions:</span>
+                                  <span className="text-xs">{escapeHtml(entry.emotions)}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </SheetContent>
-                      </Sheet>
-                    </div>
+                        </div>
+                      </SheetContent>
+                    </Sheet>
                   </div>
 
 
 
-                  {/* Additional metrics */}
-                  {(entry.energy_level ||
-                    entry.stress_level ||
-                    entry.sleep_hours ||
-                    entry.weather) && (
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {entry.energy_level && (
-                        <span className="bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full text-xs font-medium">
-                          ⚡ Energy: {entry.energy_level}/10
-                        </span>
-                      )}
-                      {entry.stress_level && (
-                        <span className="bg-orange-50 text-orange-700 border border-orange-200 px-3 py-1.5 rounded-full text-xs font-medium">
-                          😰 Stress: {entry.stress_level}/10
-                        </span>
-                      )}
-                      {entry.sleep_hours && (
-                        <span className="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-full text-xs font-medium">
-                          😴 Sleep: {entry.sleep_hours}h
-                        </span>
-                      )}
-                      {entry.weather && (
-                        <span className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-1.5 rounded-full text-xs font-medium">
-                          🌤️ {entry.weather}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  {/* Unified Badge Section */}
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {/* Mood badge - always first */}
+                    <Badge className={getMoodColor(entry.mood_score)}>
+                      {entry.mood_score}/10 - {moodLabels[entry.mood_score as keyof typeof moodLabels]}
+                    </Badge>
+
+                    {/* Additional metrics */}
+                    {entry.energy_level && (
+                      <span className="bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full text-xs font-medium">
+                        ⚡ Energy: {entry.energy_level}/10
+                      </span>
+                    )}
+                    {entry.stress_level && (
+                      <span className="bg-orange-50 text-orange-700 border border-orange-200 px-3 py-1.5 rounded-full text-xs font-medium">
+                        😰 Stress: {entry.stress_level}/10
+                      </span>
+                    )}
+                    {entry.sleep_hours && (
+                      <span className="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-full text-xs font-medium">
+                        😴 Sleep: {entry.sleep_hours}h
+                      </span>
+                    )}
+                    {entry.weather && (
+                      <span className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-1.5 rounded-full text-xs font-medium">
+                        🌤️ {entry.weather}
+                      </span>
+                    )}
+                  </div>
 
                   {/* Activity */}
                   {entry.activity && (
