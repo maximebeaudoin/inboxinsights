@@ -1,8 +1,10 @@
 'use client';
 
 import { format, formatDistanceToNow } from 'date-fns';
+import { Info } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import type { MoodEntry } from '../page';
 
@@ -81,9 +83,21 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                       {entry.mood_score}/10 -{' '}
                       {moodLabels[entry.mood_score as keyof typeof moodLabels]}
                     </Badge>
-                    <span className="text-sm text-muted-foreground font-medium">
-                      {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-3 w-3 cursor-help text-muted-foreground" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>From: {entry.from || 'Unknown'}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <span className="text-sm text-muted-foreground font-medium">
+                        {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Full date */}

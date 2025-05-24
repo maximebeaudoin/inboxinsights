@@ -12,12 +12,12 @@ export interface MoodEntry {
   energy_level?: number;
   stress_level?: number;
   note?: string;
-  emotions?: string;
   weather?: string;
   sleep_hours?: number;
   date_occurred: string;
   created_at: string;
   activity?: string;
+  from?: string;
 }
 
 async function getMoodEntries(): Promise<MoodEntry[]> {
