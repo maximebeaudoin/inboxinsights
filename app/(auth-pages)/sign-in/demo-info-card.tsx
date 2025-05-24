@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, ExternalLink } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,7 +48,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 
 export function DemoInfoCard() {
   return (
-    <Card className="bg-muted/30 border-0 shadow-none">
+    <Card className="bg-muted/50 border-0 shadow-none">
       <CardHeader>
         <CardTitle className="text-lg">Demo Account Information</CardTitle>
         <CardDescription>
@@ -94,6 +94,31 @@ export function DemoInfoCard() {
           </div>
           <p className="text-xs text-muted-foreground">
             Send your data to this email address for processing
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label>GitHub Repository</Label>
+          <div className="flex gap-2">
+            <Input
+              value="https://github.com/maximebeaudoin/inboxinsights"
+              disabled
+              className="flex-1 text-xs"
+            />
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              onClick={() =>
+                window.open('https://github.com/maximebeaudoin/inboxinsights', '_blank')
+              }
+              className="h-8 w-8 shrink-0"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            View the source code and contribute to the project
           </p>
         </div>
       </CardContent>

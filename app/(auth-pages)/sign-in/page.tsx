@@ -38,6 +38,20 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                 Sign in
               </SubmitButton>
               <FormMessage message={searchParams} />
+
+              <div className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-6">
+                <p>
+                  Created with love by{' '}
+                  <a
+                    href="https://github.com/maximebeaudoin"
+                    target="_blank"
+                    className="font-bold hover:underline"
+                    rel="noreferrer"
+                  >
+                    Maxime Beaudoin
+                  </a>
+                </p>
+              </div>
             </div>
           </form>
         </div>
