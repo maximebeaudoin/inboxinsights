@@ -134,24 +134,6 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                     </div>
                   )}
 
-                  {/* Emotions and Activity */}
-                  {(entry.emotions || entry.activity) && (
-                    <div className="space-y-2">
-                      {entry.emotions && (
-                        <div className="text-sm">
-                          <span className="font-medium text-foreground">💭 Emotions: </span>
-                          <span className="text-muted-foreground">{entry.emotions}</span>
-                        </div>
-                      )}
-                      {entry.activity && (
-                        <div className="text-sm">
-                          <span className="font-medium text-foreground">🎯 Activity: </span>
-                          <span className="text-muted-foreground">{entry.activity}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
                   {/* Note */}
                   {entry.note && (
                     <div className="bg-muted/50 p-3 rounded-md border-l-4 border-primary/20">
