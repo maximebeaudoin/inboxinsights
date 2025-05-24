@@ -1,5 +1,6 @@
-import { ArrowUpRight, InfoIcon } from "lucide-react";
-import Link from "next/link";
+import Link from 'next/link';
+
+import { ArrowUpRight, InfoIcon } from 'lucide-react';
 
 export function SmtpMessage() {
   return (
@@ -7,8 +8,8 @@ export function SmtpMessage() {
       <InfoIcon size={16} className="mt-0.5" />
       <div className="flex flex-col gap-1">
         <small className="text-sm text-secondary-foreground">
-          <strong> Note:</strong> Emails are rate limited. Enable Custom SMTP to
-          increase the rate limit.
+          <strong> Note:</strong> Emails are rate limited. Enable Custom SMTP to increase the rate
+          limit.
         </small>
         <div>
           <Link

@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Environment files
+.env*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage and test outputs
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+junit.xml
+
+# Config files (optional - uncomment if you don't want to format them)
+# .prettierignore
+# .stylelintignore
+# .eslintignore
+
+# Documentation and stories
+docs/
+stories/
+storybook-static/
+
+# Husky hooks
+.husky/
+
+# Package lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# OS generated files
+.DS_Store
+Thumbs.db
