@@ -1,11 +1,13 @@
 # ESLint and Prettier Setup for Next.js Supabase Project
 
 ## Overview
+
 This project has been configured with ESLint and Prettier for code quality and consistent formatting. The setup is optimized for Next.js 15, TypeScript, React, and Supabase.
 
 ## Installed Packages
 
 ### ESLint Dependencies
+
 - `eslint` - Core ESLint package
 - `@typescript-eslint/parser` - TypeScript parser for ESLint
 - `@typescript-eslint/eslint-plugin` - TypeScript-specific linting rules
@@ -16,6 +18,7 @@ This project has been configured with ESLint and Prettier for code quality and c
 - `@eslint/js` - ESLint JavaScript configurations
 
 ### Prettier Dependencies
+
 - `prettier` - Core Prettier package
 - `prettier-plugin-tailwindcss` - Tailwind CSS class sorting
 - `@trivago/prettier-plugin-sort-imports` - Import sorting
@@ -23,6 +26,7 @@ This project has been configured with ESLint and Prettier for code quality and c
 ## Configuration Files
 
 ### ESLint Configuration (`eslint.config.js`)
+
 - Uses the new ESLint v9 flat config format
 - Configured for TypeScript and React
 - Includes accessibility rules
@@ -30,12 +34,14 @@ This project has been configured with ESLint and Prettier for code quality and c
 - Proper global variables for browser and Node.js environments
 
 ### Prettier Configuration (`prettier.config.js`)
+
 - Configured for consistent code formatting
 - Tailwind CSS class sorting enabled
 - Import sorting with custom order for Supabase projects
 - Optimized for TypeScript and React
 
 ### VS Code Integration
+
 - `.vscode/settings.json` - Auto-format on save, ESLint integration
 - `.vscode/extensions.json` - Recommended extensions
 
@@ -64,6 +70,7 @@ npm run check-all     # Run type-check, lint:check, and format:check
 ⚠️ **ESLint**: 15 warnings (mostly non-critical)
 
 ### ESLint Warnings Summary
+
 - React unescaped entities (can be ignored or fixed manually)
 - Non-null assertions in Supabase utilities (expected for environment variables)
 - Unused variables in error handling (can be prefixed with `_` to ignore)
@@ -71,12 +78,15 @@ npm run check-all     # Run type-check, lint:check, and format:check
 ## Usage
 
 ### Pre-commit Workflow
+
 1. Run `npm run format` to format your code
 2. Run `npm run lint` to fix linting issues
 3. Run `npm run check-all` to verify everything is correct
 
 ### IDE Integration
+
 If using VS Code with the recommended extensions:
+
 - Files will auto-format on save
 - ESLint errors will be highlighted
 - Import statements will be automatically organized
@@ -84,13 +94,17 @@ If using VS Code with the recommended extensions:
 ## Customization
 
 ### Adding New Rules
+
 Edit `eslint.config.js` to add or modify linting rules.
 
 ### Changing Formatting
+
 Edit `prettier.config.js` to adjust formatting preferences.
 
 ### Import Order
+
 The import order is configured for Supabase projects:
+
 1. React imports
 2. Next.js imports
 3. Supabase imports
