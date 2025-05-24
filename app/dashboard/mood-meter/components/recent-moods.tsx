@@ -107,7 +107,9 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                           </span>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{format(new Date(entry.created_at), "EEEE, MMMM do, yyyy 'at' h:mm a")}</p>
+                          <p>
+                            {format(new Date(entry.created_at), "EEEE, MMMM do, yyyy 'at' h:mm a")}
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -147,50 +149,90 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                           <div>
                             <h4 className="text-sm font-medium mb-2">Raw Data</h4>
                             <div className="space-y-2 text-sm">
+                              {/* Core Fields */}
                               <div className="grid grid-cols-2 gap-2">
                                 <span className="font-medium">ID:</span>
                                 <span className="font-mono text-xs">{entry.id}</span>
                               </div>
+
                               {entry.email_entry_id && (
                                 <div className="grid grid-cols-2 gap-2">
                                   <span className="font-medium">Email Entry ID:</span>
-                                  <span className="font-mono text-xs">
-                                    {entry.email_entry_id}
+                                  <span className="font-mono text-xs">{entry.email_entry_id}</span>
+                                </div>
+                              )}
+
+                              {/* Mood Data */}
+                              <div className="grid grid-cols-2 gap-2">
+                                <span className="font-medium">Mood Score:</span>
+                                <span className="font-mono text-xs">{entry.mood_score}/10</span>
+                              </div>
+
+                              {entry.energy_level && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Energy Level:</span>
+                                  <span className="font-mono text-xs">{entry.energy_level}/10</span>
+                                </div>
+                              )}
+
+                              {entry.stress_level && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Stress Level:</span>
+                                  <span className="font-mono text-xs">{entry.stress_level}/10</span>
+                                </div>
+                              )}
+
+                              {entry.sleep_hours && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Sleep Hours:</span>
+                                  <span className="font-mono text-xs">{entry.sleep_hours}h</span>
+                                </div>
+                              )}
+
+                              {/* Text Fields */}
+                              {entry.note && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Note:</span>
+                                  <span className="text-xs break-words">
+                                    {escapeHtml(entry.note)}
                                   </span>
                                 </div>
                               )}
-                              {entry.user_email && (
+
+                              {entry.weather && (
                                 <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">User Email:</span>
-                                  <span className="font-mono text-xs">{entry.user_email}</span>
+                                  <span className="font-medium">Weather:</span>
+                                  <span className="text-xs">{escapeHtml(entry.weather)}</span>
                                 </div>
                               )}
+
+                              {entry.activity && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Activity:</span>
+                                  <span className="text-xs break-words">
+                                    {escapeHtml(entry.activity)}
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Source Information */}
                               <div className="grid grid-cols-2 gap-2">
                                 <span className="font-medium">From:</span>
-                                <span className="font-mono text-xs">
-                                  {entry.from || 'Unknown'}
-                                </span>
+                                <span className="font-mono text-xs">{entry.from || 'N/A'}</span>
                               </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                <span className="font-medium">Date Occurred:</span>
-                                <span className="font-mono text-xs">{entry.date_occurred}</span>
-                              </div>
+
+                              {entry.from_name && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">From Name:</span>
+                                  <span className="font-mono text-xs">{entry.from_name}</span>
+                                </div>
+                              )}
+
+                              {/* Timestamps */}
                               <div className="grid grid-cols-2 gap-2">
                                 <span className="font-medium">Created At:</span>
                                 <span className="font-mono text-xs">{entry.created_at}</span>
                               </div>
-                              {entry.activity && (
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Activity:</span>
-                                  <span className="text-xs">{escapeHtml(entry.activity)}</span>
-                                </div>
-                              )}
-                              {entry.emotions && (
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Emotions:</span>
-                                  <span className="text-xs">{escapeHtml(entry.emotions)}</span>
-                                </div>
-                              )}
                             </div>
                           </div>
                         </div>
@@ -198,13 +240,12 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                     </Sheet>
                   </div>
 
-
-
                   {/* Unified Badge Section */}
                   <div className="flex flex-wrap gap-2 pt-1">
                     {/* Mood badge - always first */}
                     <Badge className={getMoodColor(entry.mood_score)}>
-                      {entry.mood_score}/10 - {moodLabels[entry.mood_score as keyof typeof moodLabels]}
+                      {entry.mood_score}/10 -{' '}
+                      {moodLabels[entry.mood_score as keyof typeof moodLabels]}
                     </Badge>
 
                     {/* Additional metrics */}

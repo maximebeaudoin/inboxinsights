@@ -8,19 +8,17 @@ import { MoodMeterDashboard } from './components/mood-meter-dashboard';
 export interface MoodEntry {
   id: string;
   email_entry_id?: string;
-  user_email?: string;
   mood_score: number;
   energy_level?: number;
   stress_level?: number;
   note?: string;
   weather?: string;
   sleep_hours?: number;
-  date_occurred: string;
-  created_at: string;
   activity?: string;
-  emotions?: string;
-  from?: string;
   original_text?: string;
+  from?: string;
+  from_name?: string;
+  created_at: string;
 }
 
 async function getMoodEntries(viewMode: 'personal' | 'global' = 'personal'): Promise<MoodEntry[]> {
