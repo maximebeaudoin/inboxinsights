@@ -1,10 +1,6 @@
 import Link from 'next/link';
 
-import DeployButton from '@/components/deploy-button';
-import { EnvVarWarning } from '@/components/env-var-warning';
 import HeaderAuth from '@/components/header-auth';
-
-import { hasEnvVars } from '@/utils/supabase/check-env-vars';
 
 export default function MainNav() {
   return (
