@@ -104,6 +104,10 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                       {moodLabels[entry.mood_score as keyof typeof moodLabels]}
                     </Badge>
                     <div className="flex items-center gap-1">
+
+                      <span className="text-sm text-muted-foreground font-medium">
+                        {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
+                      </span>
                       {/* Raw Data Sheet */}
                       <Sheet>
                         <SheetTrigger asChild>
@@ -115,7 +119,7 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                             <FileText className="h-3 w-3" />
                           </Button>
                         </SheetTrigger>
-                        <SheetContent className="w-[500px] sm:w-[500px] sm:max-w-[500px]">
+                        <SheetContent className="w-[500px] sm:w-[700px] sm:max-w-[700px] overflow-y-auto">
                           <SheetHeader>
                             <SheetTitle>Raw Entry Data</SheetTitle>
                             <SheetDescription>
@@ -188,20 +192,6 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                           </div>
                         </SheetContent>
                       </Sheet>
-
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="h-3 w-3 cursor-help text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>From: {entry.from || 'Unknown'}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <span className="text-sm text-muted-foreground font-medium">
-                        {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
-                      </span>
                     </div>
                   </div>
 
@@ -239,11 +229,24 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                     </div>
                   )}
 
+                  {/* Activity */}
+                  {entry.activity && (
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">🏃 Activity:</span>
+                          <span className="text-sm ">{entry.activity}</span>
+                        </div>
+                      </div>
+                  )}
+
                   {/* Note */}
                   {entry.note && (
-                    <div className="bg-muted/50 p-3 rounded-md border-l-4 border-primary/20">
-                      <p className="text-sm italic text-muted-foreground">"{entry.note}"</p>
-                    </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">💡 Hint:</span>
+                          <span className="text-sm">{entry.note}</span>
+                        </div>
+                      </div>
                   )}
                 </div>
               </div>
