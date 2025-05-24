@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -12,13 +14,15 @@ import type { MoodEntry } from '../page';
 import { MoodChart } from './mood-chart';
 import { MoodStats } from './mood-stats';
 import { RecentMoods } from './recent-moods';
+import { type ViewMode, ViewModeToggle } from './view-mode-toggle';
 
 interface MoodMeterDashboardProps {
   initialMoodEntries: MoodEntry[];
 }
 
 export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardProps) {
-  const { moodEntries, loading, error, refetch } = useMoodEntries(initialMoodEntries);
+  const [viewMode, setViewMode] = useState<ViewMode>('personal');
+  const { moodEntries, loading, error, refetch } = useMoodEntries(initialMoodEntries, viewMode);
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
@@ -42,6 +46,9 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
         </Alert>
       )}
 
+      {/* View Mode Toggle */}
+      <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} disabled={loading} />
+
       {/* Real-time indicator */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -63,7 +70,11 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
       <Card>
         <CardHeader>
           <CardTitle>Mood Trends</CardTitle>
-          <CardDescription>Your mood patterns over time</CardDescription>
+          <CardDescription>
+            {viewMode === 'personal'
+              ? 'Your mood patterns over time'
+              : 'Global mood patterns from all users'}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <MoodChart moodEntries={moodEntries} />
@@ -74,7 +85,11 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
       <div className="space-y-4">
         <div className="space-y-2">
           <h2 className="text-2xl font-semibold tracking-tight">Recent Mood Entries</h2>
-          <p className="text-muted-foreground">Your latest mood recordings</p>
+          <p className="text-muted-foreground">
+            {viewMode === 'personal'
+              ? 'Your latest mood recordings'
+              : 'Latest mood recordings from all users'}
+          </p>
         </div>
         <RecentMoods moodEntries={moodEntries} />
       </div>

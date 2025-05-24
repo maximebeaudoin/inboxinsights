@@ -93,7 +93,6 @@ export function MoodChart({ moodEntries }: MoodChartProps) {
       stress: entry.stress_level || null,
       sleep: entry.sleep_hours || null,
       note: entry.note || '',
-      emotions: entry.emotions || '',
       activity: entry.activity || '',
       weather: entry.weather || '',
     }));
@@ -136,9 +135,6 @@ export function MoodChart({ moodEntries }: MoodChartProps) {
               <div className="text-sm text-muted-foreground">😴 Sleep: {data.sleep}h</div>
             )}
             {data.weather && <div className="text-sm text-muted-foreground">🌤️ {data.weather}</div>}
-            {data.emotions && (
-              <div className="text-sm text-muted-foreground">💭 {data.emotions}</div>
-            )}
             {data.activity && (
               <div className="text-sm text-muted-foreground">🎯 {data.activity}</div>
             )}

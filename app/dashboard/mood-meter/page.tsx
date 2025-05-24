@@ -8,6 +8,7 @@ import { MoodMeterDashboard } from './components/mood-meter-dashboard';
 export interface MoodEntry {
   id: string;
   email_entry_id?: string;
+  user_email?: string;
   mood_score: number;
   energy_level?: number;
   stress_level?: number;
@@ -17,10 +18,11 @@ export interface MoodEntry {
   date_occurred: string;
   created_at: string;
   activity?: string;
+  emotions?: string;
   from?: string;
 }
 
-async function getMoodEntries(): Promise<MoodEntry[]> {
+async function getMoodEntries(viewMode: 'personal' | 'global' = 'personal'): Promise<MoodEntry[]> {
   const supabase = await createClient();
 
   const {
@@ -31,11 +33,18 @@ async function getMoodEntries(): Promise<MoodEntry[]> {
     return [];
   }
 
-  const { data: moodEntries, error } = await supabase
+  let query = supabase
     .from('mood_entries')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(50);
+
+  // Filter by user email only in personal mode
+  if (viewMode === 'personal') {
+    query = query.eq('from', user.email);
+  }
+
+  const { data: moodEntries, error } = await query;
 
   if (error) {
     console.error('Error fetching mood entries:', error);

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { createClient } from '@/utils/supabase/client';
 
+import type { ViewMode } from '@/app/dashboard/mood-meter/components/view-mode-toggle';
 import type { MoodEntry } from '@/app/dashboard/mood-meter/page';
 
 interface UseMoodEntriesReturn {
@@ -13,10 +14,14 @@ interface UseMoodEntriesReturn {
   refetch: () => Promise<void>;
 }
 
-export function useMoodEntries(initialData: MoodEntry[] = []): UseMoodEntriesReturn {
+export function useMoodEntries(
+  initialData: MoodEntry[] = [],
+  viewMode: ViewMode = 'personal'
+): UseMoodEntriesReturn {
   const [moodEntries, setMoodEntries] = useState<MoodEntry[]>(initialData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const supabase = createClient();
 
   const fetchMoodEntries = useCallback(async () => {
@@ -33,11 +38,18 @@ export function useMoodEntries(initialData: MoodEntry[] = []): UseMoodEntriesRet
         return;
       }
 
-      const { data: moodEntriesData, error: fetchError } = await supabase
+      let query = supabase
         .from('mood_entries')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
+
+      // Filter by user email only in personal mode
+      if (viewMode === 'personal') {
+        query = query.eq('from', user.email);
+      }
+
+      const { data: moodEntriesData, error: fetchError } = await query;
 
       if (fetchError) {
         console.error('Error fetching mood entries:', fetchError);
@@ -52,18 +64,24 @@ export function useMoodEntries(initialData: MoodEntry[] = []): UseMoodEntriesRet
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, [supabase, viewMode]);
 
   const refetch = async () => {
     await fetchMoodEntries();
   };
 
   useEffect(() => {
-    // If we don't have initial data, fetch it
-    if (initialData.length === 0) {
-      fetchMoodEntries();
+    // On first load, if we have initial data and we're in personal mode, just mark as initialized
+    if (!hasInitialized && initialData.length > 0 && viewMode === 'personal') {
+      setHasInitialized(true);
+      return;
     }
-  }, [initialData.length, fetchMoodEntries]);
+
+    // For all other cases (view mode changes, no initial data, or global mode), fetch fresh data
+    setMoodEntries([]);
+    fetchMoodEntries();
+    setHasInitialized(true);
+  }, [fetchMoodEntries, viewMode, initialData.length, hasInitialized]);
 
   useEffect(() => {
     // Set up real-time subscription
@@ -76,18 +94,27 @@ export function useMoodEntries(initialData: MoodEntry[] = []): UseMoodEntriesRet
           schema: 'public',
           table: 'mood_entries',
         },
-        (payload) => {
+        async (payload) => {
           // Real-time update received
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+
+          if (!user) return;
 
           if (payload.eventType === 'INSERT') {
             const newEntry = payload.new as MoodEntry;
-            setMoodEntries((current) => {
-              // Add new entry at the beginning and maintain limit of 50
-              const updated = [newEntry, ...current].slice(0, 50);
-              return updated;
-            });
+            // Only add entry if it matches the current view mode
+            if (viewMode === 'global' || newEntry.from === user.email) {
+              setMoodEntries((current) => {
+                // Add new entry at the beginning and maintain limit of 50
+                const updated = [newEntry, ...current].slice(0, 50);
+                return updated;
+              });
+            }
           } else if (payload.eventType === 'UPDATE') {
             const updatedEntry = payload.new as MoodEntry;
+            // Only update if entry is currently in our list
             setMoodEntries((current) =>
               current.map((entry) => (entry.id === updatedEntry.id ? updatedEntry : entry))
             );
@@ -103,7 +130,7 @@ export function useMoodEntries(initialData: MoodEntry[] = []): UseMoodEntriesRet
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase]);
+  }, [supabase, viewMode]);
 
   return {
     moodEntries,
