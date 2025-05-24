@@ -18,6 +18,7 @@ export interface MoodEntry {
   original_text?: string;
   from?: string;
   from_name?: string;
+  subject?: string;
   created_at: string;
 }
 

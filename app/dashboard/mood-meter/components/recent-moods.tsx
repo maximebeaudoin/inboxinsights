@@ -162,6 +162,15 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                                 </div>
                               )}
 
+                              {entry.subject && (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <span className="font-medium">Subject:</span>
+                                  <span className="text-xs break-words">
+                                    {escapeHtml(entry.subject)}
+                                  </span>
+                                </div>
+                              )}
+
                               {/* Mood Data */}
                               <div className="grid grid-cols-2 gap-2">
                                 <span className="font-medium">Mood Score:</span>
@@ -243,7 +252,9 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                   {/* Unified Badge Section */}
                   <div className="flex flex-wrap gap-2 pt-1">
                     {/* Mood badge - always first */}
-                    <span className={`px-3 py-1.5 rounded-full text-xs font-medium border ${getMoodColor(entry.mood_score)}`}>
+                    <span
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border ${getMoodColor(entry.mood_score)}`}
+                    >
                       {entry.mood_score}/10 -{' '}
                       {moodLabels[entry.mood_score as keyof typeof moodLabels]}
                     </span>
