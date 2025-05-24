@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { createClient } from '@/utils/supabase/client';
 
-import type { MoodEntry } from '@/app/mood-meter/page';
+import type { MoodEntry } from '@/app/dashboard/mood-meter/page';
 
 interface UseMoodEntriesReturn {
   moodEntries: MoodEntry[];
