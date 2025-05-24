@@ -1,8 +1,8 @@
 import Link from 'next/link';
 
-import { createClient } from '@/utils/supabase/server';
-
 import HeaderAuth from '@/components/header-auth';
+
+import { createClient } from '@/utils/supabase/server';
 
 export default async function MainNav() {
   const supabase = await createClient();
