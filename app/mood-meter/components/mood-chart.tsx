@@ -39,8 +39,8 @@ export function MoodChart({ moodEntries }: MoodChartProps) {
     );
   }
 
-  const maxMood = Math.max(...chartData.map((d) => d.mood));
-  const minMood = Math.min(...chartData.map((d) => d.mood));
+  const _maxMood = Math.max(...chartData.map((d) => d.mood));
+  const _minMood = Math.min(...chartData.map((d) => d.mood));
 
   return (
     <div className="w-full h-64 relative">
@@ -92,8 +92,9 @@ export function MoodChart({ moodEntries }: MoodChartProps) {
                 r="4"
                 fill="hsl(var(--primary))"
                 className="hover:r-6 transition-all cursor-pointer"
-                title={`${point.date}: ${point.mood}/10`}
-              />
+              >
+                <title>{`${point.date}: ${point.mood}/10`}</title>
+              </circle>
             );
           })}
         </svg>

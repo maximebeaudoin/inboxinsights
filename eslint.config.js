@@ -4,10 +4,21 @@ const typescriptParser = require('@typescript-eslint/parser');
 const react = require('eslint-plugin-react');
 const reactHooks = require('eslint-plugin-react-hooks');
 const jsxA11y = require('eslint-plugin-jsx-a11y');
+const { FlatCompat } = require('@eslint/eslintrc');
+const path = require('path');
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all,
+});
 
 module.exports = [
   // Base configuration for all files
   js.configs.recommended,
+
+  // Next.js configuration using FlatCompat
+  ...compat.extends('next/core-web-vitals'),
 
   // Configuration for TypeScript and React files
   {
@@ -61,6 +72,14 @@ module.exports = [
         HTMLButtonElement: 'readonly',
         HTMLInputElement: 'readonly',
         HTMLSpanElement: 'readonly',
+        HTMLParagraphElement: 'readonly',
+        HTMLHeadingElement: 'readonly',
+        HTMLTableElement: 'readonly',
+        HTMLTableSectionElement: 'readonly',
+        HTMLTableRowElement: 'readonly',
+        HTMLTableCellElement: 'readonly',
+        HTMLTableCaptionElement: 'readonly',
+        HTMLTextAreaElement: 'readonly',
         Element: 'readonly',
         Event: 'readonly',
       },
