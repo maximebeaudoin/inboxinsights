@@ -81,22 +81,22 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
   return (
     <div className="relative">
       {/* Timeline line */}
-      <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border"></div>
+      <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gradient-to-b from-border via-border to-transparent"></div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {moodEntries.slice(0, 10).map((entry, index) => (
           <div key={entry.id} className="relative flex items-start gap-6">
             {/* Timeline dot */}
             <div className="relative z-10 flex-shrink-0">
-              <div className="w-12 h-12 rounded-full bg-background border-2 border-border flex items-center justify-center text-2xl shadow-sm">
+              <div className="w-12 h-12 rounded-full bg-background border-2 border-border flex items-center justify-center text-2xl shadow-md hover:shadow-lg transition-shadow duration-200">
                 {moodEmojis[entry.mood_score as keyof typeof moodEmojis]}
               </div>
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0 pb-6">
-              <div className="bg-card rounded-lg border p-4 shadow-sm hover:shadow-md transition-shadow">
-                <div className="space-y-3">
+              <div className="bg-card rounded-lg border p-5 shadow-sm hover:shadow-md transition-all duration-200 hover:border-border/80">
+                <div className="space-y-4">
                   {/* Header with mood and time */}
                   <div className="flex items-center justify-between gap-2">
                     <Badge className={getMoodColor(entry.mood_score)}>
@@ -196,7 +196,7 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                   </div>
 
                   {/* Full date */}
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground font-medium border-b border-border/30 pb-3">
                     {format(new Date(entry.created_at), "EEEE, MMMM do, yyyy 'at' h:mm a")}
                   </div>
 
@@ -205,24 +205,24 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                     entry.stress_level ||
                     entry.sleep_hours ||
                     entry.weather) && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 pt-1">
                       {entry.energy_level && (
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-xs font-medium">
+                        <span className="bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full text-xs font-medium">
                           ⚡ Energy: {entry.energy_level}/10
                         </span>
                       )}
                       {entry.stress_level && (
-                        <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-md text-xs font-medium">
+                        <span className="bg-orange-50 text-orange-700 border border-orange-200 px-3 py-1.5 rounded-full text-xs font-medium">
                           😰 Stress: {entry.stress_level}/10
                         </span>
                       )}
                       {entry.sleep_hours && (
-                        <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md text-xs font-medium">
+                        <span className="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-full text-xs font-medium">
                           😴 Sleep: {entry.sleep_hours}h
                         </span>
                       )}
                       {entry.weather && (
-                        <span className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-md text-xs font-medium">
+                        <span className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-1.5 rounded-full text-xs font-medium">
                           🌤️ {entry.weather}
                         </span>
                       )}
@@ -231,22 +231,34 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
 
                   {/* Activity */}
                   {entry.activity && (
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">🏃 Activity:</span>
-                          <span className="text-sm ">{entry.activity}</span>
-                        </div>
+                    <div className="space-y-1">
+                      <div className="flex items-start gap-2">
+                        <span className="text-sm font-medium text-muted-foreground flex-shrink-0">
+                          🏃 Activity:
+                        </span>
                       </div>
+                      <div className="pl-6">
+                        <p className="text-sm text-foreground leading-relaxed">
+                          {entry.activity}
+                        </p>
+                      </div>
+                    </div>
                   )}
 
-                  {/* Note */}
+                  {/* Note/Hint */}
                   {entry.note && (
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">💡 Hint:</span>
-                          <span className="text-sm">{entry.note}</span>
-                        </div>
+                    <div className="space-y-1">
+                      <div className="flex items-start gap-2">
+                        <span className="text-sm font-medium text-muted-foreground flex-shrink-0">
+                           Bobby:
+                        </span>
                       </div>
+                      <div className="pl-6">
+                        <p className="text-sm text-foreground leading-relaxed">
+                          {entry.note}
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
