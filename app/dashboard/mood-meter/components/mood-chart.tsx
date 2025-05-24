@@ -140,7 +140,7 @@ export function MoodChart({ moodEntries }: MoodChartProps) {
             )}
             {data.note && (
               <div className="text-sm italic text-muted-foreground border-t pt-2 mt-2">
-                "{data.note}"
+                <span className="text-xs font-medium">🤖 Aura:</span> "{data.note}"
               </div>
             )}
           </div>

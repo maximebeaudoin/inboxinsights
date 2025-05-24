@@ -104,7 +104,6 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                       {moodLabels[entry.mood_score as keyof typeof moodLabels]}
                     </Badge>
                     <div className="flex items-center gap-1">
-
                       <span className="text-sm text-muted-foreground font-medium">
                         {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
                       </span>
@@ -238,25 +237,36 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                         </span>
                       </div>
                       <div className="pl-6">
-                        <p className="text-sm text-foreground leading-relaxed">
-                          {entry.activity}
-                        </p>
+                        <p className="text-sm text-foreground leading-relaxed">{entry.activity}</p>
                       </div>
                     </div>
                   )}
 
-                  {/* Note/Hint */}
+                  {/* AI Insight */}
                   {entry.note && (
-                    <div className="space-y-1">
-                      <div className="flex items-start gap-2">
-                        <span className="text-sm font-medium text-muted-foreground flex-shrink-0">
-                           Bobby:
-                        </span>
-                      </div>
-                      <div className="pl-6">
-                        <p className="text-sm text-foreground leading-relaxed">
-                          {entry.note}
-                        </p>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-3">
+                        {/* Avatar */}
+                        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center border border-gray-300 dark:border-gray-600">
+                          <span className="text-sm">🤖</span>
+                        </div>
+
+                        {/* Chat bubble */}
+                        <div className="flex-1 max-w-[85%]">
+                          <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
+                                Aura
+                              </span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">
+                                AI Assistant
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
+                              {entry.note}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
