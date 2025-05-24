@@ -104,9 +104,18 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                       {moodLabels[entry.mood_score as keyof typeof moodLabels]}
                     </Badge>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm text-muted-foreground font-medium">
-                        {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
-                      </span>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-sm text-muted-foreground font-medium cursor-help">
+                              {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{format(new Date(entry.created_at), "EEEE, MMMM do, yyyy 'at' h:mm a")}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       {/* Raw Data Sheet */}
                       <Sheet>
                         <SheetTrigger asChild>
@@ -194,10 +203,7 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                     </div>
                   </div>
 
-                  {/* Full date */}
-                  <div className="text-sm text-muted-foreground font-medium border-b border-border/30 pb-3">
-                    {format(new Date(entry.created_at), "EEEE, MMMM do, yyyy 'at' h:mm a")}
-                  </div>
+
 
                   {/* Additional metrics */}
                   {(entry.energy_level ||
