@@ -1,0 +1,367 @@
+{
+  "name": "Inbox Insight",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f12fc46a-945f-48c0-84d0-8884ea0eecf6",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -10
+      ],
+      "id": "195f6da3-4844-48e6-b3a0-2050b7098312",
+      "name": "Webhook",
+      "webhookId": "f12fc46a-945f-48c0-84d0-8884ea0eecf6"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        308,
+        -40
+      ],
+      "id": "fd91b29c-ba3c-4ca2-be5e-f880c6a3e547",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "VkWcdO0yK7iczx0c",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "mood_entries",
+          "mode": "list",
+          "cachedResultName": "mood_entries"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mood_score": "={{ $json.message.content.mood_score }}",
+            "energy_level": "={{ $json.message.content.energy_level }}",
+            "sleep_hours": "={{ $json.message.content.sleep_hours }}",
+            "email_entry_id": "={{ $('Webhook').item.json.body.MessageID }}",
+            "activity": "={{ $json.message.content.activity }}",
+            "note": "={{ $json.message.content.note }}",
+            "stress_level": "={{ $json.message.content.stress_level }}",
+            "weather": "={{ $json.message.content.weather }}",
+            "from": "={{ $('Webhook').item.json.body.From }}",
+            "original_text": "={{ $('Webhook').item.json.body.TextBody }}",
+            "from_name": "={{ $('Webhook').item.json.body.FromName }}"
+          },
+          "matchingColumns": [
+            "email_entry_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email_entry_id",
+              "displayName": "email_entry_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mood_score",
+              "displayName": "mood_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "energy_level",
+              "displayName": "energy_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "stress_level",
+              "displayName": "stress_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "note",
+              "displayName": "note",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "weather",
+              "displayName": "weather",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "sleep_hours",
+              "displayName": "sleep_hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "activity",
+              "displayName": "activity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "original_text",
+              "displayName": "original_text",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "from",
+              "displayName": "from",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "from_name",
+              "displayName": "from_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        596,
+        -160
+      ],
+      "id": "f96b22b1-6267-44fc-8ea3-b0faad22c7be",
+      "name": "Mood Table Insert",
+      "credentials": {
+        "postgres": {
+          "id": "a2wOnAuYIZFZZfNU",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=Extract Expense data from this\n\nEmail Body : {{ $json.body.TextBody }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "sleep_hours",
+              "description": "Extract the sleeping amount of hours in format DECIMAL(3,1)"
+            },
+            {
+              "name": "mood_score",
+              "description": "Estimate the mood level from 1 to 10 based on the content",
+              "required": true
+            },
+            {
+              "name": "energy_level",
+              "description": "Estimate the energy level of the person from 1 to 10 based on the email body. Always estimate something",
+              "required": true
+            },
+            {
+              "name": "activity",
+              "description": "Create a description of what the user have done or is doing",
+              "required": true
+            },
+            {
+              "name": "note",
+              "description": "Response to the mood of the user. Send him a answer to encourage him with a resume of what he have done",
+              "required": true
+            },
+            {
+              "name": "stress_level",
+              "description": "Estimate the stress level from 1 to 10 based on the email content",
+              "required": true
+            },
+            {
+              "name": "weather",
+              "description": "If the user talk about the weather. Make a resume"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -260
+      ],
+      "id": "c78033d8-30ed-4591-848c-456a3e900118",
+      "name": "Email DATA Extractor"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# Email Parsing Prompt for Sleep & Wellness Data Extraction\n\n## System Instructions\nYou are an AI assistant specialized in extracting sleep and wellness data from personal emails. Your task is to analyze email content and extract specific health-related metrics in a structured JSON format.\n\n## Core Task\nParse the provided email content and extract the following fields as accurately as possible:\n\n### Required Fields:\n- **sleep_hours**: Number of hours slept (extract from text, estimate if approximate)\n- **mood_score**: Mood rating from 1-10 (1=very bad, 10=excellent)\n- **energy_level**: Energy level from 1-10 (1=exhausted, 10=very energetic)\n- **activity**: Brief summary of activities mentioned\n- **stress_level**: Stress level from 1-10 (1=very relaxed, 10=extremely stressed)\n- **weather**: Weather information if mentioned (null if not discussed)\n- **note**: Encouraging message summarizing the user's day and accomplishments\n\n## Parsing Guidelines\n\n### Sleep Hours Extraction:\n- Look for explicit mentions: \"slept 8 hours\", \"got 6.5 hours of sleep\"\n- Parse time ranges: \"went to bed at 10pm, woke up at 6am\" = 8 hours\n- Handle approximations: \"slept poorly\", \"barely got any sleep\" = estimate low (3-5 hours)\n- If unclear but sleep is mentioned, provide best estimate\n- If no sleep info found, return null\n\n### Mood Score (1-10):\n- **1-3**: Terrible, awful, depressed, very sad, miserable\n- **4-5**: Bad, down, not great, struggling, frustrated  \n- **6-7**: Okay, fine, average, neutral, so-so\n- **8-9**: Good, happy, positive, great, upbeat\n- **10**: Excellent, amazing, fantastic, euphoric, perfect\n\n### Energy Level (1-10):\n- **1-3**: Exhausted, drained, no energy, can't function\n- **4-5**: Tired, low energy, sluggish, dragging\n- **6-7**: Moderate energy, okay, getting by\n- **8-9**: Energetic, good energy, productive, active\n- **10**: Super energetic, full of energy, unstoppable\n\n### Activity Summary:\n- Summarize main activities mentioned in 1-2 sentences\n- Focus on significant events, not routine tasks\n- If no activities mentioned, return \"No specific activities mentioned\"\n\n### Stress Level (1-10):\n- **1-3**: Very relaxed, calm, peaceful, zen, no worries\n- **4-5**: Mild stress, some concerns, manageable pressure\n- **6-7**: Moderate stress, noticeable pressure, some anxiety\n- **8-9**: High stress, overwhelmed, anxious, pressure\n- **10**: Extreme stress, panic, crisis mode, breaking point\n\n### Weather Information:\n- Extract any weather mentions: sunny, rainy, cold, hot, temperature, etc.\n- Include temperature if mentioned\n- If no weather discussed, return null\n- Format as brief description: \"Sunny and warm\", \"Rainy, 15°C\"\n\n### Encouraging Note:\n- Create a personalized, encouraging message (2-3 sentences)\n- **Always include the user's name** to make it personal and engaging\n- Acknowledge the user's activities and efforts positively\n- Highlight any accomplishments or positive aspects mentioned\n- Offer gentle motivation or recognition\n- Keep tone warm, supportive, and uplifting\n- Examples: \"Great job getting that workout in despite feeling tired, Sarah! Taking care of your health shows real commitment.\", \"It sounds like you handled a busy day really well, Mike. Even small steps forward are worth celebrating!\"\n\n## Output Format\nAlways respond with valid JSON only:\n\n```json\n{\n  \"sleep_hours\": 7.5,\n  \"mood_score\": 6,\n  \"energy_level\": 4,\n  \"activity\": \"Worked from home, had lunch with Sarah, evening yoga class\",\n  \"stress_level\": 7,\n  \"weather\": \"Rainy and cold\",\n  \"note\": \"Nice work fitting in that yoga class even after a busy work day, Alex! Taking time for self-care shows you're prioritizing your wellbeing.\"\n}\n```\n\n## Important Rules:\n1. Always return valid JSON format\n2. Use null for missing information, not empty strings\n3. Numbers should be integers or decimals (not strings)\n4. Be conservative with estimates - if unclear, err on the side of neutral values\n5. Focus on the overall tone and content, not individual words\n6. Consider context clues and implied information\n\n## Example Analysis Process:\n1. Read the entire email content\n2. Identify explicit mentions of each field\n3. Infer missing values from context and tone\n4. Rate subjective scores based on language patterns\n5. Format as clean JSON response\n\n---\n\n**User's name:** {{ $json.body.FromName }}\n**Email content to analyze:**\n{{ $json.body.TextBody }}\n\nPlease analyze the above email and return the extracted data in the specified JSON format. Remember to use the user's name in the encouraging note.",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        220,
+        140
+      ],
+      "id": "9426a325-3c28-450a-b218-e7a8f475586e",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "VkWcdO0yK7iczx0c",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email DATA Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email DATA Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email DATA Extractor": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Mood Table Insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f20ecaf0-6bb6-4bbc-bf68-4e263054003d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ec045710f17d4c255cf43b4ac8b15ef0fe0282614f5eb8b4b3cff367211cb1eb"
+  },
+  "id": "jCynVa9DbZDR8wnW",
+  "tags": []
+}
