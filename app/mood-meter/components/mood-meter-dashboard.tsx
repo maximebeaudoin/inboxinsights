@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import type { MoodEntry } from '../page';
 import { MoodChart } from './mood-chart';
@@ -20,37 +19,25 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
       {/* Mood Statistics */}
       <MoodStats moodEntries={moodEntries} />
 
-      {/* Tabs for different views */}
-      <Tabs defaultValue="chart" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="chart">Mood Chart</TabsTrigger>
-          <TabsTrigger value="recent">Recent Entries</TabsTrigger>
-        </TabsList>
+      {/* Mood Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Mood Trends</CardTitle>
+          <CardDescription>Your mood patterns over time</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <MoodChart moodEntries={moodEntries} />
+        </CardContent>
+      </Card>
 
-        <TabsContent value="chart" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Mood Trends</CardTitle>
-              <CardDescription>Your mood patterns over time</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MoodChart moodEntries={moodEntries} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="recent" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Mood Entries</CardTitle>
-              <CardDescription>Your latest mood recordings</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RecentMoods moodEntries={moodEntries} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Recent Mood Entries Timeline */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold tracking-tight">Recent Mood Entries</h2>
+          <p className="text-muted-foreground">Your latest mood recordings</p>
+        </div>
+        <RecentMoods moodEntries={moodEntries} />
+      </div>
     </div>
   );
 }
