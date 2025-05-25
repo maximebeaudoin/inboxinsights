@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-import type { MoodEntry } from '../page';
+import type { MoodEntry } from '@/lib/types/mood-entry';
 
 interface MoodChartProps {
   moodEntries: MoodEntry[];

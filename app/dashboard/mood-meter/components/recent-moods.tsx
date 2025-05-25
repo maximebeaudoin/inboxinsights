@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { format, formatDistanceToNow } from 'date-fns';
-import { FileText, Info, Trash2 } from 'lucide-react';
+import { FileText, Trash2 } from 'lucide-react';
 
 import { DataIngestionInfo } from '@/components/data-ingestion-info';
 import {
@@ -17,7 +17,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -29,16 +28,20 @@ import {
 } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+import { createMoodEntriesService } from '@/lib/services/mood-entries';
+import type { MoodEntry } from '@/lib/types/mood-entry';
+
 import { createClient } from '@/utils/supabase/client';
 
 import { deleteMoodEntryAction } from '@/app/actions';
 
 import { useToast } from '@/hooks/use-toast';
 
-import type { MoodEntry } from '../page';
-
 interface RecentMoodsProps {
   moodEntries: MoodEntry[];
+  hasMore?: boolean;
+  loadingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 // Utility function to escape HTML entities for XSS protection
@@ -85,27 +88,42 @@ const getMoodColor = (score: number) => {
   return 'bg-green-100 text-green-800 border-green-200';
 };
 
-export function RecentMoods({ moodEntries }: RecentMoodsProps) {
+export function RecentMoods({
+  moodEntries,
+  hasMore = false,
+  loadingMore = false,
+  onLoadMore,
+}: RecentMoodsProps) {
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null);
-  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  const [displayCount, setDisplayCount] = useState(10);
+  const [canDeleteMap, setCanDeleteMap] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
-  const supabase = createClient();
 
-  // Get current user email
+  const supabase = useMemo(() => createClient(), []);
+  const moodEntriesService = useMemo(() => createMoodEntriesService(supabase), [supabase]);
+
+  // Check permissions for all entries (optimized to get user once)
   useEffect(() => {
-    const getCurrentUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setCurrentUserEmail(user?.email || null);
+    const checkPermissions = async () => {
+      if (moodEntries.length === 0) return;
+
+      // Get current user once instead of for each entry
+      const user = await moodEntriesService.getCurrentUser();
+      const permissions: Record<string, boolean> = {};
+
+      for (const entry of moodEntries) {
+        permissions[entry.id] = user !== null && entry.from === user.email;
+      }
+
+      setCanDeleteMap(permissions);
     };
 
-    getCurrentUser();
-  }, [supabase]);
+    checkPermissions();
+  }, [moodEntries, moodEntriesService]);
 
   // Check if current user can delete this entry
   const canDeleteEntry = (entry: MoodEntry): boolean => {
-    return currentUserEmail !== null && entry.from === currentUserEmail;
+    return canDeleteMap[entry.id] || false;
   };
 
   const handleDeleteEntry = async (entryId: string) => {
@@ -138,6 +156,27 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
     }
   };
 
+  const handleLoadMore = () => {
+    const remainingEntries = moodEntries.length - displayCount;
+    const nextBatch = Math.min(10, remainingEntries);
+
+    if (nextBatch > 0) {
+      // Show more from already loaded entries
+      setDisplayCount((prev) => prev + nextBatch);
+    } else if (hasMore && onLoadMore) {
+      // Load more from server
+      onLoadMore();
+    }
+  };
+
+  // Reset display count when mood entries change (e.g., view mode switch)
+  useEffect(() => {
+    setDisplayCount(10);
+  }, [moodEntries.length]);
+
+  const displayedEntries = moodEntries.slice(0, displayCount);
+  const canShowMore = displayCount < moodEntries.length || hasMore;
+
   if (moodEntries.length === 0) {
     return (
       <div className="space-y-6">
@@ -159,7 +198,7 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
       <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gradient-to-b from-border via-border to-transparent"></div>
 
       <div className="space-y-8">
-        {moodEntries.slice(0, 10).map((entry, index) => (
+        {displayedEntries.map((entry) => (
           <div key={entry.id} className="relative flex items-start gap-6">
             {/* Timeline dot */}
             <div className="relative z-10 flex-shrink-0">
@@ -466,9 +505,35 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
         ))}
       </div>
 
-      {moodEntries.length > 10 && (
+      {/* Load More Section */}
+      {canShowMore && (
+        <div className="text-center pt-6 space-y-4">
+          <div className="text-sm text-muted-foreground">
+            Showing {displayedEntries.length} out of {moodEntries.length} loaded entries
+            {hasMore && ' (more available)'}
+          </div>
+          <Button
+            variant="outline"
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className="min-w-[120px]"
+          >
+            {loadingMore ? (
+              <>
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                Loading...
+              </>
+            ) : (
+              'Load More'
+            )}
+          </Button>
+        </div>
+      )}
+
+      {/* Show total count when all entries are displayed */}
+      {!canShowMore && moodEntries.length > 0 && (
         <div className="text-center text-sm text-muted-foreground pt-4">
-          Showing 10 most recent entries out of {moodEntries.length} total
+          All {moodEntries.length} entries displayed
         </div>
       )}
     </div>

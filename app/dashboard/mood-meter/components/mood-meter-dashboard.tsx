@@ -8,13 +8,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
+import type { MoodEntry, ViewMode } from '@/lib/types/mood-entry';
+
 import { useMoodEntries } from '@/hooks/use-mood-entries';
 
-import type { MoodEntry } from '../page';
 import { MoodChart } from './mood-chart';
 import { MoodStats } from './mood-stats';
 import { RecentMoods } from './recent-moods';
-import { type ViewMode, ViewModeToggle } from './view-mode-toggle';
+import { ViewModeToggle } from './view-mode-toggle';
 
 interface MoodMeterDashboardProps {
   initialMoodEntries: MoodEntry[];
@@ -22,7 +23,10 @@ interface MoodMeterDashboardProps {
 
 export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
-  const { moodEntries, loading, error, refetch } = useMoodEntries(initialMoodEntries, viewMode);
+  const { moodEntries, loading, loadingMore, error, hasMore, refetch, loadMore } = useMoodEntries(
+    initialMoodEntries,
+    viewMode
+  );
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
@@ -91,7 +95,12 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
               : 'Latest mood recordings from all users'}
           </p>
         </div>
-        <RecentMoods moodEntries={moodEntries} />
+        <RecentMoods
+          moodEntries={moodEntries}
+          hasMore={hasMore}
+          loadingMore={loadingMore}
+          onLoadMore={loadMore}
+        />
       </div>
     </div>
   );

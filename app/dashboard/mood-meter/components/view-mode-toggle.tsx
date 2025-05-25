@@ -5,7 +5,7 @@ import { Globe, User } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
-export type ViewMode = 'personal' | 'global';
+import type { ViewMode } from '@/lib/types/mood-entry';
 
 interface ViewModeToggleProps {
   viewMode: ViewMode;

@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import type { MoodEntry } from '../page';
+import type { MoodEntry } from '@/lib/types/mood-entry';
 
 interface MoodStatsProps {
   moodEntries: MoodEntry[];
