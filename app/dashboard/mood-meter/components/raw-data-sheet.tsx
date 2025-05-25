@@ -1,5 +1,6 @@
 'use client';
 
+import { encode } from 'html-entities';
 import { FileText } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -13,17 +14,6 @@ import {
 } from '@/components/ui/sheet';
 
 import type { MoodEntry } from '@/lib/types/mood-entry';
-
-// HTML escape utility function - works in both server and client environments
-function escapeHtml(text: string): string {
-  // Server-side safe HTML escaping
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
 
 interface RawDataSheetProps {
   entry: MoodEntry;
@@ -56,7 +46,7 @@ export function RawDataSheet({ entry, className }: RawDataSheetProps) {
               <h4 className="text-sm font-medium mb-2">Original Text</h4>
               <div className="bg-muted p-3 rounded-md border">
                 <pre className="text-sm whitespace-pre-wrap break-words">
-                  {escapeHtml(entry.original_text)}
+                  {encode(entry.original_text)}
                 </pre>
               </div>
             </div>
@@ -82,7 +72,7 @@ export function RawDataSheet({ entry, className }: RawDataSheetProps) {
               {entry.subject && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                   <span className="font-medium">Subject:</span>
-                  <span className="text-xs break-words">{escapeHtml(entry.subject)}</span>
+                  <span className="text-xs break-words">{encode(entry.subject)}</span>
                 </div>
               )}
 
@@ -117,21 +107,21 @@ export function RawDataSheet({ entry, className }: RawDataSheetProps) {
               {entry.note && (
                 <div className="grid grid-cols-1 gap-1 sm:gap-2">
                   <span className="font-medium">Note:</span>
-                  <span className="text-xs break-words">{escapeHtml(entry.note)}</span>
+                  <span className="text-xs break-words">{encode(entry.note)}</span>
                 </div>
               )}
 
               {entry.weather && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                   <span className="font-medium">Weather:</span>
-                  <span className="text-xs">{escapeHtml(entry.weather)}</span>
+                  <span className="text-xs">{encode(entry.weather)}</span>
                 </div>
               )}
 
               {entry.activity && (
                 <div className="grid grid-cols-1 gap-1 sm:gap-2">
                   <span className="font-medium">Activity:</span>
-                  <span className="text-xs break-words">{escapeHtml(entry.activity)}</span>
+                  <span className="text-xs break-words">{encode(entry.activity)}</span>
                 </div>
               )}
 
