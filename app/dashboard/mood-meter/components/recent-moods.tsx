@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+import { APP_CONFIG } from '@/lib/config';
 import { PAGINATION_CONFIG } from '@/lib/config/pagination';
 import { createMoodEntriesService } from '@/lib/services/mood-entries';
 import type { MoodEntry } from '@/lib/types/mood-entry';
@@ -118,8 +119,16 @@ export function RecentMoods({
       const user = await moodEntriesService.getCurrentUser();
       const permissions: Record<string, boolean> = {};
 
+      // Check if current user is the demo user
+      const isDemoUser = user !== null && user.email === APP_CONFIG.demo.email;
+
       for (const entry of moodEntries) {
-        permissions[entry.id] = user !== null && entry.from === user.email;
+        // Demo user cannot delete any entries, even their own
+        if (isDemoUser) {
+          permissions[entry.id] = false;
+        } else {
+          permissions[entry.id] = user !== null && entry.from === user.email;
+        }
       }
 
       setCanDeleteMap(permissions);

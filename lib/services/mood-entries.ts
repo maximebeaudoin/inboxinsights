@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+import { APP_CONFIG } from '@/lib/config';
 import { PAGINATION_CONFIG } from '@/lib/config/pagination';
 import { getCurrentUser } from '@/lib/supabase/auth';
 import type {
@@ -115,6 +116,14 @@ export class MoodEntriesService {
       };
     }
 
+    // Demo user cannot delete any entries, even their own
+    if (user.email === APP_CONFIG.demo.email) {
+      return {
+        success: false,
+        error: 'Demo user cannot delete entries',
+      };
+    }
+
     try {
       // First, verify that the mood entry belongs to the current user
       const { data: moodEntry, error: fetchError } = await this.supabase
@@ -178,6 +187,12 @@ export class MoodEntriesService {
    */
   async canDeleteEntry(entry: MoodEntry): Promise<boolean> {
     const user = await this.getCurrentUser();
+
+    // Demo user cannot delete any entries, even their own
+    if (user !== null && user.email === APP_CONFIG.demo.email) {
+      return false;
+    }
+
     return user !== null && entry.from === user.email;
   }
 
