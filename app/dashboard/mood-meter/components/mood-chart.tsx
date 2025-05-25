@@ -59,7 +59,8 @@ export function MoodChart({ moodEntries }: MoodChartProps) {
   const chartData = useMemo(() => {
     if (moodEntries.length === 0) return [];
 
-    const sortedEntries = moodEntries.sort(
+    // Create a copy of the array before sorting to avoid mutating the original
+    const sortedEntries = [...moodEntries].sort(
       (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
     );
 
