@@ -47,7 +47,7 @@ export async function GET() {
           details: {
             hasToken: true,
             hasFromEmail: !!fromEmail,
-            fromEmail: fromEmail,
+            fromEmail,
             mode: 'postmark',
           },
         });

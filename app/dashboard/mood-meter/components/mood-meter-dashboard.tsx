@@ -106,7 +106,7 @@ const calculateEnhancedAnalytics = (moodEntries: MoodEntry[]): EnhancedAnalytics
   );
 
   let currentStreak = 0;
-  let checkDate = new Date(today);
+  const checkDate = new Date(today);
 
   for (let i = 0; i < 30; i++) {
     // Check last 30 days

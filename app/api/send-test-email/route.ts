@@ -32,11 +32,11 @@ export async function POST(request: NextRequest) {
       // Fallback to simulation mode if Postmark is not configured
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      console.log('📧 Test email simulation (Postmark not configured):', {
+      console.warn('📧 Test email simulation (Postmark not configured):', {
         from: APP_CONFIG.demo.email,
         to: APP_CONFIG.dataIngestion.email,
-        subject: subject,
-        message: message,
+        subject,
+        message,
         timestamp: new Date().toISOString(),
         user: user.email,
       });
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
         details: {
           from: APP_CONFIG.demo.email,
           to: APP_CONFIG.dataIngestion.email,
-          subject: subject,
+          subject,
           mode: 'simulation',
         },
       });
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
         details: {
           from: process.env.POSTMARK_FROM_EMAIL || APP_CONFIG.demo.email,
           to: APP_CONFIG.dataIngestion.email,
-          subject: subject,
+          subject,
           mode: 'postmark',
         },
       });
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         details: {
           from: APP_CONFIG.demo.email,
           to: APP_CONFIG.dataIngestion.email,
-          subject: subject,
+          subject,
           mode: 'simulation_fallback',
           error: 'Postmark service unavailable',
         },
