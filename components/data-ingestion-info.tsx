@@ -30,6 +30,27 @@ import { APP_CONFIG } from '@/lib/config';
 
 import { useToast } from '@/hooks/use-toast';
 
+/**
+ * DataIngestionInfo Component
+ *
+ * A reusable component that displays instructions for sending mood data via email.
+ *
+ * Usage examples:
+ *
+ * // Full version with all instructions (default)
+ * <DataIngestionInfo />
+ * <DataIngestionInfo variant="default" />
+ *
+ * // Compact version for dashboards or sidebars
+ * <DataIngestionInfo variant="compact" />
+ *
+ * // Without title
+ * <DataIngestionInfo showTitle={false} />
+ *
+ * // With custom styling
+ * <DataIngestionInfo className="my-custom-class" variant="compact" />
+ */
+
 interface DataIngestionInfoProps {
   showTitle?: boolean;
   className?: string;
