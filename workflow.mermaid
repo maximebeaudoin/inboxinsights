@@ -1,0 +1,33 @@
+flowchart TD
+    A[User] -->|Sends mood email| B[Postmark Inbound]
+    B -->|Webhook payload| C[N8N Workflow]
+
+    C -->|Email content| D[AI Content Moderation]
+    D --> E{Content Violation?}
+
+    E -->|Yes - Flagged| F[Block Processing]
+    F -->|Send violation email| G[Postmark Outbound]
+    G -->|Violation notification| A
+    F -->|Log violation| H[Supabase Database]
+
+    E -->|No - Clean| I[AI Mood Analysis]
+    I -->|Extract mood data| J[Structured Data]
+    J -->|Store mood entry| H
+
+    H -->|Real-time update| K[Supabase Realtime]
+    K -->|Live data sync| L[Next.js Dashboard]
+    L -->|Updated UI| M[User Dashboard]
+
+    style A fill:#e1f5fe
+    style B fill:#fff3e0
+    style C fill:#f3e5f5
+    style D fill:#e8f5e8
+    style E fill:#ffebee
+    style F fill:#ffebee
+    style G fill:#fff3e0
+    style H fill:#fce4ec
+    style I fill:#e8f5e8
+    style J fill:#e8f5e8
+    style K fill:#e3f2fd
+    style L fill:#e3f2fd
+    style M fill:#e1f5fe

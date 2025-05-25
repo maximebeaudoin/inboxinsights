@@ -23,8 +23,7 @@ export function PrivacyContentNotice() {
         <AlertTitle className="text-red-800 dark:text-red-200">Content Policy</AlertTitle>
         <AlertDescription className="text-red-700 dark:text-red-300">
           Content containing sexual themes, hate speech, harassment, self-harm, violence, threats,
-          or any inappropriate material will <strong>NOT be tolerated</strong> and may result in
-          account suspension. Please keep all mood tracking content appropriate and respectful.
+          or any inappropriate material will be filtered since this is one of the key feature we want to showcase. However, Please keep all mood tracking content appropriate and respectful.
         </AlertDescription>
       </Alert>
     </div>

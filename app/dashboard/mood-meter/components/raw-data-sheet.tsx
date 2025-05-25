@@ -113,6 +113,7 @@ export function RawDataSheet({ entry, className }: RawDataSheetProps) {
               <DataRow label="Entry ID" value={entry.id} mono />
               <DataRow label="Email Entry ID" value={entry.email_entry_id} mono />
               <DataRow label="Subject" value={entry.subject} encode />
+              <DataRow label="Has Violation Data" value={entry.email_violation ? 'Yes' : 'No'} />
             </div>
           </CollapsibleSection>
 
@@ -137,7 +138,7 @@ export function RawDataSheet({ entry, className }: RawDataSheetProps) {
 
           {/* Additional Details */}
           {(entry.note || entry.weather || entry.activity) && (
-            <CollapsibleSection title="Additional Details" defaultOpen={false}>
+            <CollapsibleSection title="Additional Details" defaultOpen={true}>
               <div className="space-y-0">
                 <DataRow label="Note" value={entry.note} encode />
                 <DataRow label="Weather" value={entry.weather} encode />
@@ -147,7 +148,7 @@ export function RawDataSheet({ entry, className }: RawDataSheetProps) {
           )}
 
           {/* Source Information */}
-          <CollapsibleSection title="Source Information" defaultOpen={false}>
+          <CollapsibleSection title="Source Information" defaultOpen={true}>
             <div className="space-y-0">
               <DataRow label="From Email" value={entry.from || 'N/A'} mono />
               <DataRow label="From Name" value={entry.from_name} />
@@ -156,13 +157,13 @@ export function RawDataSheet({ entry, className }: RawDataSheetProps) {
           </CollapsibleSection>
 
           {/* Content Moderation */}
-          {entry.email_violation && (
-            <CollapsibleSection title="Content Moderation" defaultOpen={false}>
+          {entry.email_violation ? (
+            <CollapsibleSection title="Content Moderation" defaultOpen={true}>
               {(() => {
                 const violation = entry.email_violation;
 
-                // Get flagged categories
-                const flaggedCategories = [
+                // Get all categories that are true (regardless of flagged status)
+                const detectedCategories = [
                   violation.sexual && 'Sexual',
                   violation.hate && 'Hate',
                   violation.harassment && 'Harassment',
@@ -195,16 +196,23 @@ export function RawDataSheet({ entry, className }: RawDataSheetProps) {
                       <DataRow label="Moderation Date" value={violation.created_at} mono />
                     </div>
 
-                    {violation.flagged && flaggedCategories.length > 0 && (
+                    {/* Show detected categories regardless of flagged status */}
+                    {detectedCategories.length > 0 && (
                       <div>
                         <h5 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-                          Violation Categories:
+                          {violation.flagged
+                            ? 'Violation Categories:'
+                            : 'Detected Categories (Not Flagged):'}
                         </h5>
                         <div className="flex flex-wrap gap-1">
-                          {flaggedCategories.map((category) => (
+                          {detectedCategories.map((category) => (
                             <span
                               key={category}
-                              className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800 px-2 py-1 rounded text-xs"
+                              className={`px-2 py-1 rounded text-xs border ${
+                                violation.flagged
+                                  ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'
+                                  : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800'
+                              }`}
                             >
                               {category}
                             </span>
@@ -212,11 +220,36 @@ export function RawDataSheet({ entry, className }: RawDataSheetProps) {
                         </div>
                       </div>
                     )}
+
+                    {/* Show message when no categories are detected */}
+                    {detectedCategories.length === 0 && (
+                      <div className="text-xs text-muted-foreground">
+                        No content violations detected in any category.
+                      </div>
+                    )}
                   </div>
                 );
               })()}
             </CollapsibleSection>
-          )}
+          ) : entry.email_entry_id ? (
+            <CollapsibleSection title="Content Moderation" defaultOpen={true}>
+              <div className="text-xs text-muted-foreground">
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-yellow-600 dark:text-yellow-400">⚠️</span>
+                    <span className="font-medium text-yellow-800 dark:text-yellow-200">
+                      Violation Data Missing
+                    </span>
+                  </div>
+                  <p className="text-yellow-700 dark:text-yellow-300">
+                    This entry has an email_entry_id ({entry.email_entry_id}) but no violation data
+                    was found. This might indicate a data loading issue or the violation record
+                    hasn't been created yet.
+                  </p>
+                </div>
+              </div>
+            </CollapsibleSection>
+          ) : null}
         </div>
       </SheetContent>
     </Sheet>

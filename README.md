@@ -16,9 +16,11 @@
 ## Features
 
 - **📧 Email Integration**: Analyze mood from email content using n8n workflows
-- **📊 Mood Tracking**: Track mood, energy, and stress levels over time
-- **🤖 AI Insights**: Get AI-powered insights and summaries from your mood data
-- **📈 Analytics Dashboard**: Visualize mood trends and patterns
+- **📊 Advanced Mood Tracking**: Track mood, energy, and stress levels over time with rich analytics
+- **🤖 AI Insights**: Get AI-powered insights, personalized recommendations, and pattern analysis
+- **📈 Multi-Tab Analytics Dashboard**: Comprehensive visualization with Overview, Trends, and Insights tabs
+- **📅 Mood Heatmap**: GitHub-style calendar view showing 12 weeks of mood patterns
+- **📊 Rich Visualizations**: Interactive charts, distribution analysis, and trend tracking
 - **🔐 Secure Authentication**: User authentication with Supabase Auth
 - **🎨 Modern UI**: Built with Next.js, Tailwind CSS, and shadcn/ui components
 - **🗄️ Robust Database**: PostgreSQL with Supabase for data management

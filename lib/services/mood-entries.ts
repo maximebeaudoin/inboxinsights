@@ -270,11 +270,15 @@ export class MoodEntriesService {
             const newEntry = payload.new as MoodEntry;
             // Only trigger callback if it matches the current view mode
             if (viewMode === 'global' || newEntry.from === user.email) {
-              onInsert(newEntry);
+              // Load email violations for the new entry
+              const entriesWithViolations = await this.attachEmailViolations([newEntry]);
+              onInsert(entriesWithViolations[0]);
             }
           } else if (payload.eventType === 'UPDATE') {
             const updatedEntry = payload.new as MoodEntry;
-            onUpdate(updatedEntry);
+            // Load email violations for the updated entry
+            const entriesWithViolations = await this.attachEmailViolations([updatedEntry]);
+            onUpdate(entriesWithViolations[0]);
           } else if (payload.eventType === 'DELETE') {
             const deletedEntry = payload.old as MoodEntry;
             onDelete(deletedEntry);

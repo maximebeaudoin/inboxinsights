@@ -25,7 +25,6 @@ interface MoodChartProps {
 }
 
 type ChartType = 'line' | 'area';
-type TimeRange = '7d' | '30d' | '90d' | 'all';
 
 const moodEmojis = {
   1: '😢',
@@ -56,36 +55,15 @@ const getMoodGradient = (score: number) => {
 
 export function MoodChart({ moodEntries }: MoodChartProps) {
   const [chartType, setChartType] = useState<ChartType>('area');
-  const [timeRange, setTimeRange] = useState<TimeRange>('30d');
 
   const chartData = useMemo(() => {
     if (moodEntries.length === 0) return [];
 
-    // Calculate date range
-    const now = new Date();
-    let startDate: Date;
+    const sortedEntries = moodEntries.sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
 
-    switch (timeRange) {
-      case '7d':
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case '30d':
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      case '90d':
-        startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-        break;
-      case 'all':
-      default:
-        startDate = new Date(0); // Beginning of time
-        break;
-    }
-
-    const filteredEntries = moodEntries
-      .filter((entry) => new Date(entry.created_at) >= startDate)
-      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-
-    return filteredEntries.map((entry) => ({
+    return sortedEntries.map((entry) => ({
       date: format(new Date(entry.created_at), 'MMM dd'),
       fullDate: entry.created_at,
       mood: entry.mood_score,
@@ -96,7 +74,7 @@ export function MoodChart({ moodEntries }: MoodChartProps) {
       activity: entry.activity || '',
       weather: entry.weather || '',
     }));
-  }, [moodEntries, timeRange]);
+  }, [moodEntries]);
 
   if (chartData.length === 0) {
     return (
@@ -155,38 +133,7 @@ export function MoodChart({ moodEntries }: MoodChartProps) {
   return (
     <div className="w-full space-y-4">
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-        <div className="flex gap-2">
-          <Button
-            variant={timeRange === '7d' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setTimeRange('7d')}
-          >
-            7 Days
-          </Button>
-          <Button
-            variant={timeRange === '30d' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setTimeRange('30d')}
-          >
-            30 Days
-          </Button>
-          <Button
-            variant={timeRange === '90d' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setTimeRange('90d')}
-          >
-            90 Days
-          </Button>
-          <Button
-            variant={timeRange === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setTimeRange('all')}
-          >
-            All Time
-          </Button>
-        </div>
-
+      <div className="flex justify-end">
         <div className="flex gap-2">
           <Button
             variant={chartType === 'line' ? 'default' : 'outline'}
