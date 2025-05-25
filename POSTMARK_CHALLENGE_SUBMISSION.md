@@ -14,7 +14,10 @@ Key features include:
 
 - **📧 Email-Based Data Ingestion**: Send mood updates via email using Postmark's inbound parsing
 - **🤖 AI-Powered Analysis**: GPT-4 extracts mood scores, energy levels, stress indicators, and activities
-- **📊 Interactive Dashboard**: Real-time mood visualization with charts and trends
+- **📊 Advanced Analytics Dashboard**: Multi-tab interface with Overview, Trends, and AI Insights
+- **📈 Rich Visualizations**: Interactive charts, mood heatmaps, distribution analysis, and trend tracking
+- **🧠 AI-Powered Insights**: Personalized recommendations based on mood patterns and correlations
+- **📅 Mood Heatmap**: GitHub-style calendar view showing mood patterns over 12 weeks
 - **🛡️ Content Moderation**: Automated content filtering with violation detection and blocking
 - **🔐 Secure Authentication**: User authentication and data privacy with Supabase Auth
 - **📱 Responsive Design**: Modern UI built with Next.js, Tailwind CSS, and shadcn/ui
@@ -72,7 +75,10 @@ Activities: Morning jog, work meetings, lunch with friends
 ```
 
 6. **Watch real-time updates** as your email gets processed and appears on the dashboard
-7. **Explore features** like mood charts, timeline view, and AI-generated insights
+7. **Explore advanced features**:
+   - **Overview Tab**: Enhanced mood statistics, today's mood, weekly trends, and recent entries timeline
+   - **Trends Tab**: Interactive mood charts, distribution analysis, and 12-week mood heatmap
+   - **Insights Tab**: AI-powered personalized recommendations and pattern analysis
 
 ### Content Moderation Demo
 
@@ -197,6 +203,14 @@ The platform doesn't just store data - it provides intelligent analysis, extract
 ### Content Moderation
 
 Built-in AI content moderation ensures the platform maintains appropriate communication standards while protecting user experience.
+
+### Advanced Analytics Dashboard
+
+The platform features a sophisticated three-tab dashboard interface:
+
+- **Overview Tab**: Real-time mood statistics, today's mood tracking, weekly trends, and timeline of recent entries
+- **Trends Tab**: Interactive mood charts with time-series analysis, mood distribution pie charts, and a GitHub-style mood heatmap showing 12 weeks of data
+- **Insights Tab**: AI-powered personalized insights including mood pattern analysis, sleep correlation, stress indicators, and actionable recommendations
 
 ### Real-time Dashboard
 
