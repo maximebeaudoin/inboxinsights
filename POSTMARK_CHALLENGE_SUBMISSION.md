@@ -96,10 +96,18 @@ The complete source code is available on GitHub with comprehensive documentation
 
 **InboxInsights** uses a modern, scalable architecture built around Postmark's inbound email processing:
 
+📊 **[View Complete Workflow Diagram →](https://github.com/maximebeaudoin/inboxinsights/blob/main/workflow.svg)**
+
+The architecture consists of four main layers:
+
 1. **Email Ingestion Layer**: Postmark receives emails and triggers webhooks to n8n
 2. **Processing Layer**: n8n workflows handle AI analysis and content moderation
 3. **Data Storage Layer**: Supabase PostgreSQL stores structured mood data
 4. **Presentation Layer**: Next.js dashboard provides real-time visualization
+
+As shown in the diagram above, the system processes emails through two distinct paths:
+- **Content Violation Path**: Inappropriate content is blocked and triggers immediate email notifications
+- **Clean Content Path**: Valid mood data flows through AI analysis to the dashboard
 
 ### Tech Stack
 
