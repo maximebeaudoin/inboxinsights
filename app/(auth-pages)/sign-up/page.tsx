@@ -7,7 +7,6 @@ import { useSearchParams } from 'next/navigation';
 
 import { AlertTriangle, Lock, Mail, UserPlus } from 'lucide-react';
 
-import { DemoCredentialsButton } from '@/components/demo-credentials-button';
 import { FormMessage, Message } from '@/components/form-message';
 import { SubmitButton } from '@/components/submit-button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -21,11 +20,6 @@ export default function Signup() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const handlePopulateCredentials = (demoEmail: string, demoPassword: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-  };
 
   // Convert searchParams to Message format for FormMessage component
   const getFormMessage = (): Message | null => {
@@ -88,6 +82,8 @@ export default function Signup() {
             </CardHeader>
             <CardContent>
               <form className="flex flex-col space-y-4">
+                {message && <FormMessage message={message} />}
+
                 <div className="space-y-2">
                   <Label htmlFor="email" className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
@@ -131,22 +127,6 @@ export default function Signup() {
                 >
                   Sign up
                 </SubmitButton>
-
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">Or</span>
-                  </div>
-                </div>
-
-                <DemoCredentialsButton
-                  onPopulateCredentials={handlePopulateCredentials}
-                  className="mt-2"
-                />
-
-                {message && <FormMessage message={message} />}
               </form>
             </CardContent>
           </Card>
