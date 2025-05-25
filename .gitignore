@@ -42,3 +42,10 @@ next-env.d.ts
 
 # Jetbrains
 .idea
+
+# Supabase
+.branches
+.temp
+.env.local
+supabase/.branches
+supabase/.temp

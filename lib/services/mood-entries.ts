@@ -9,6 +9,9 @@ import type {
   ViewMode,
 } from '@/lib/types/mood-entry';
 
+// Import database utilities from Supabase directory
+import { validateMoodEntry } from '@/supabase/database-utils';
+
 /**
  * Service class for mood entries operations
  */
