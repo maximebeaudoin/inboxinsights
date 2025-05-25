@@ -34,20 +34,16 @@ function CollapsibleSection({ title, children, defaultOpen = true }: Collapsible
 
   return (
     <Card className="border-muted">
-      <CardHeader className="pb-3">
+      <CardHeader
+        className="p-3 cursor-pointer hover:bg-muted/50 transition-colors"
+        onClick={() => setIsOpen(!isOpen)}
+      >
         <CardTitle className="flex items-center justify-between text-sm font-medium">
           <span>{title}</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-          </Button>
+          {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </CardTitle>
       </CardHeader>
-      {isOpen && <CardContent className="pt-0">{children}</CardContent>}
+      {isOpen && <CardContent className="p-4">{children}</CardContent>}
     </Card>
   );
 }
@@ -99,7 +95,7 @@ export function RawDataSheet({ entry, className }: RawDataSheetProps) {
           <SheetTitle>Raw Entry Data</SheetTitle>
           <SheetDescription>Complete raw data and metadata for this mood entry</SheetDescription>
         </SheetHeader>
-        <div className="mt-6 space-y-6">
+        <div className="mt-6 space-y-4">
           {/* Original Text */}
           {entry.original_text && (
             <CollapsibleSection title="Original Text" defaultOpen={true}>
