@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+import { PAGINATION_CONFIG } from '@/lib/config/pagination';
 import { createMoodEntriesService } from '@/lib/services/mood-entries';
 import type { MoodEntry } from '@/lib/types/mood-entry';
 
@@ -95,7 +96,7 @@ export function RecentMoods({
   onLoadMore,
 }: RecentMoodsProps) {
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null);
-  const [displayCount, setDisplayCount] = useState(10);
+  const [displayCount, setDisplayCount] = useState(PAGINATION_CONFIG.INITIAL_DISPLAY_COUNT);
   const [canDeleteMap, setCanDeleteMap] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
@@ -158,7 +159,7 @@ export function RecentMoods({
 
   const handleLoadMore = () => {
     const remainingEntries = moodEntries.length - displayCount;
-    const nextBatch = Math.min(10, remainingEntries);
+    const nextBatch = Math.min(PAGINATION_CONFIG.LOAD_MORE_DISPLAY_COUNT, remainingEntries);
 
     if (nextBatch > 0) {
       // Show more from already loaded entries
@@ -171,7 +172,7 @@ export function RecentMoods({
 
   // Reset display count when mood entries change (e.g., view mode switch)
   useEffect(() => {
-    setDisplayCount(10);
+    setDisplayCount(PAGINATION_CONFIG.INITIAL_DISPLAY_COUNT);
   }, [moodEntries.length]);
 
   const displayedEntries = moodEntries.slice(0, displayCount);

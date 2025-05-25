@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+import { PAGINATION_CONFIG } from '@/lib/config/pagination';
 import { getCurrentUser } from '@/lib/supabase/auth';
 import type {
   MoodEntriesQuery,
@@ -19,7 +20,7 @@ export class MoodEntriesService {
    */
   async getMoodEntries({
     viewMode = 'personal',
-    limit = 50,
+    limit = PAGINATION_CONFIG.MOOD_ENTRIES_PER_PAGE,
     offset = 0,
   }: MoodEntriesQuery): Promise<PaginatedMoodEntriesResponse> {
     const user = await getCurrentUser(this.supabase);
@@ -66,7 +67,10 @@ export class MoodEntriesService {
    */
   async getInitialMoodEntries(viewMode: ViewMode = 'personal'): Promise<MoodEntry[]> {
     try {
-      const result = await this.getMoodEntries({ viewMode, limit: 50 });
+      const result = await this.getMoodEntries({
+        viewMode,
+        limit: PAGINATION_CONFIG.MOOD_ENTRIES_PER_PAGE,
+      });
       return result.data;
     } catch (error) {
       console.error('Error fetching initial mood entries:', error);

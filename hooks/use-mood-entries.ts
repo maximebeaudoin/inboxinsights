@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { PAGINATION_CONFIG } from '@/lib/config/pagination';
 import { createMoodEntriesService } from '@/lib/services/mood-entries';
 import type { MoodEntry, ViewMode } from '@/lib/types/mood-entry';
 
@@ -39,7 +40,7 @@ export function useMoodEntries(
 
       const result = await moodEntriesService.getMoodEntries({
         viewMode,
-        limit: 50,
+        limit: PAGINATION_CONFIG.MOOD_ENTRIES_PER_PAGE,
         offset: 0,
       });
 
@@ -63,7 +64,7 @@ export function useMoodEntries(
 
       const result = await moodEntriesService.getMoodEntries({
         viewMode,
-        limit: 50,
+        limit: PAGINATION_CONFIG.MOOD_ENTRIES_PER_PAGE,
         offset: currentOffset,
       });
 
@@ -107,7 +108,7 @@ export function useMoodEntries(
       (newEntry) => {
         setMoodEntries((current) => {
           // Add new entry at the beginning and maintain reasonable limit
-          const updated = [newEntry, ...current].slice(0, 100);
+          const updated = [newEntry, ...current].slice(0, PAGINATION_CONFIG.MAX_ENTRIES_IN_MEMORY);
           return updated;
         });
       },
