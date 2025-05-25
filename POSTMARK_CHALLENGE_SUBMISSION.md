@@ -106,6 +106,7 @@ The architecture consists of four main layers:
 4. **Presentation Layer**: Next.js dashboard provides real-time visualization
 
 As shown in the diagram above, the system processes emails through two distinct paths:
+
 - **Content Violation Path**: Inappropriate content is blocked and triggers immediate email notifications
 - **Clean Content Path**: Valid mood data flows through AI analysis to the dashboard
 
