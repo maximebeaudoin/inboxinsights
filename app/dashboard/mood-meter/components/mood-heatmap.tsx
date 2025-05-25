@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 
-import { format, startOfWeek, addDays, isSameDay, subWeeks } from 'date-fns';
+import { addDays, format, isSameDay, startOfWeek, subWeeks } from 'date-fns';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -24,8 +24,16 @@ const getMoodColor = (score: number | null): string => {
 const getMoodEmoji = (score: number | null): string => {
   if (score === null) return '';
   const moodEmojis = {
-    1: '😢', 2: '😞', 3: '😕', 4: '😐', 5: '😊',
-    6: '😄', 7: '😁', 8: '😍', 9: '🤩', 10: '🥳'
+    1: '😢',
+    2: '😞',
+    3: '😕',
+    4: '😐',
+    5: '😊',
+    6: '😄',
+    7: '😁',
+    8: '😍',
+    9: '🤩',
+    10: '🥳',
   };
   return moodEmojis[score as keyof typeof moodEmojis] || '😐';
 };
@@ -34,43 +42,52 @@ export function MoodHeatmap({ moodEntries }: MoodHeatmapProps) {
   const heatmapData = useMemo(() => {
     const weeks = [];
     const today = new Date();
-    
+
     // Generate last 12 weeks
     for (let i = 11; i >= 0; i--) {
       const weekStart = startOfWeek(subWeeks(today, i), { weekStartsOn: 1 }); // Monday start
       const week = [];
-      
+
       for (let j = 0; j < 7; j++) {
         const date = addDays(weekStart, j);
-        const dayEntry = moodEntries.find(entry => 
-          isSameDay(new Date(entry.created_at), date)
-        );
-        
+        const dayEntry = moodEntries.find((entry) => isSameDay(new Date(entry.created_at), date));
+
         week.push({
           date,
           mood: dayEntry?.mood_score || null,
           hasEntry: !!dayEntry,
           isToday: isSameDay(date, today),
-          isFuture: date > today
+          isFuture: date > today,
         });
       }
-      
+
       weeks.push(week);
     }
-    
+
     return weeks;
   }, [moodEntries]);
 
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Mood Calendar</CardTitle>
-        <CardDescription>
-          Your mood patterns over the last 12 weeks
-        </CardDescription>
+        <CardDescription>Your mood patterns over the last 12 weeks</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -79,7 +96,9 @@ export function MoodHeatmap({ moodEntries }: MoodHeatmapProps) {
             {heatmapData.length > 0 && (
               <>
                 <span>{months[heatmapData[0][0].date.getMonth()]}</span>
-                <span>{months[heatmapData[Math.floor(heatmapData.length / 2)][0].date.getMonth()]}</span>
+                <span>
+                  {months[heatmapData[Math.floor(heatmapData.length / 2)][0].date.getMonth()]}
+                </span>
                 <span>{months[heatmapData[heatmapData.length - 1][0].date.getMonth()]}</span>
               </>
             )}
@@ -124,9 +143,7 @@ export function MoodHeatmap({ moodEntries }: MoodHeatmapProps) {
                         </TooltipTrigger>
                         <TooltipContent>
                           <div className="text-center">
-                            <p className="font-medium">
-                              {format(day.date, 'MMM dd, yyyy')}
-                            </p>
+                            <p className="font-medium">{format(day.date, 'MMM dd, yyyy')}</p>
                             {day.hasEntry ? (
                               <div className="flex items-center gap-1 mt-1">
                                 <span>{getMoodEmoji(day.mood)}</span>
@@ -160,10 +177,8 @@ export function MoodHeatmap({ moodEntries }: MoodHeatmapProps) {
               </div>
               <span>More</span>
             </div>
-            
-            <div className="text-xs text-muted-foreground">
-              {moodEntries.length} total entries
-            </div>
+
+            <div className="text-xs text-muted-foreground">{moodEntries.length} total entries</div>
           </div>
         </div>
       </CardContent>

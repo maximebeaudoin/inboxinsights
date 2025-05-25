@@ -38,11 +38,15 @@ export function MoodDistributionChart({ moodEntries }: MoodDistributionChartProp
       else if (score >= 8 && score <= 10) distribution['8-10']++;
     });
 
-    return moodRanges.map((range) => ({
-      ...range,
-      value: distribution[range.range as keyof typeof distribution],
-      percentage: Math.round((distribution[range.range as keyof typeof distribution] / moodEntries.length) * 100),
-    })).filter(item => item.value > 0);
+    return moodRanges
+      .map((range) => ({
+        ...range,
+        value: distribution[range.range as keyof typeof distribution],
+        percentage: Math.round(
+          (distribution[range.range as keyof typeof distribution] / moodEntries.length) * 100
+        ),
+      }))
+      .filter((item) => item.value > 0);
   }, [moodEntries]);
 
   const CustomTooltip = ({ active, payload }: any) => {
@@ -91,9 +95,7 @@ export function MoodDistributionChart({ moodEntries }: MoodDistributionChartProp
     <Card>
       <CardHeader>
         <CardTitle>Mood Distribution</CardTitle>
-        <CardDescription>
-          How your moods are distributed across different ranges
-        </CardDescription>
+        <CardDescription>How your moods are distributed across different ranges</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid md:grid-cols-2 gap-6">
@@ -125,10 +127,7 @@ export function MoodDistributionChart({ moodEntries }: MoodDistributionChartProp
               {distributionData.map((item) => (
                 <div key={item.range} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }} />
                     <span className="text-lg">{item.emoji}</span>
                     <div>
                       <p className="font-medium text-sm">{item.label}</p>
@@ -146,10 +145,13 @@ export function MoodDistributionChart({ moodEntries }: MoodDistributionChartProp
             {/* Summary */}
             <div className="pt-4 border-t">
               <p className="text-sm text-muted-foreground">
-                Most common mood: <span className="font-medium">
-                  {distributionData.reduce((max, current) => 
-                    current.value > max.value ? current : max
-                  ).label}
+                Most common mood:{' '}
+                <span className="font-medium">
+                  {
+                    distributionData.reduce((max, current) =>
+                      current.value > max.value ? current : max
+                    ).label
+                  }
                 </span>
               </p>
             </div>

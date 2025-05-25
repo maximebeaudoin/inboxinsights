@@ -3,16 +3,15 @@
 import { useState } from 'react';
 
 import {
+  Activity,
   AlertCircle,
-  RefreshCw,
-  TrendingUp,
-  TrendingDown,
-  Target,
-  Calendar,
-  Zap,
-  Brain,
   Award,
-  Activity
+  Brain,
+  RefreshCw,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  Zap,
 } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -67,8 +66,16 @@ interface EnhancedAnalytics {
 // Mood emoji mapping
 const getMoodEmoji = (score: number): string => {
   const moodEmojis = {
-    1: '😢', 2: '😞', 3: '😕', 4: '😐', 5: '😊',
-    6: '😄', 7: '😁', 8: '😍', 9: '🤩', 10: '🥳'
+    1: '😢',
+    2: '😞',
+    3: '😕',
+    4: '😐',
+    5: '😊',
+    6: '😄',
+    7: '😁',
+    8: '😍',
+    9: '🤩',
+    10: '🥳',
   };
   return moodEmojis[score as keyof typeof moodEmojis] || '😐';
 };
@@ -84,7 +91,7 @@ const calculateEnhancedAnalytics = (moodEntries: MoodEntry[]): EnhancedAnalytics
       energyTrend: 'stable',
       wellnessScore: 0,
       wellnessLevel: 'poor',
-      weeklyTrend: 'stable'
+      weeklyTrend: 'stable',
     };
   }
 
@@ -94,15 +101,16 @@ const calculateEnhancedAnalytics = (moodEntries: MoodEntry[]): EnhancedAnalytics
   const twoWeeksAgo = new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
 
   // Calculate current streak
-  const sortedEntries = [...moodEntries].sort((a, b) =>
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  const sortedEntries = [...moodEntries].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
   let currentStreak = 0;
   let checkDate = new Date(today);
 
-  for (let i = 0; i < 30; i++) { // Check last 30 days
-    const hasEntry = sortedEntries.some(entry => {
+  for (let i = 0; i < 30; i++) {
+    // Check last 30 days
+    const hasEntry = sortedEntries.some((entry) => {
       const entryDate = new Date(entry.created_at);
       return entryDate.toDateString() === checkDate.toDateString();
     });
@@ -116,34 +124,36 @@ const calculateEnhancedAnalytics = (moodEntries: MoodEntry[]): EnhancedAnalytics
   }
 
   // Today's mood
-  const todayEntries = moodEntries.filter(entry => {
+  const todayEntries = moodEntries.filter((entry) => {
     const entryDate = new Date(entry.created_at);
     return entryDate.toDateString() === today.toDateString();
   });
   const todayMood = todayEntries.length > 0 ? todayEntries[0].mood_score : undefined;
 
   // Weekly analysis
-  const thisWeekEntries = moodEntries.filter(entry => new Date(entry.created_at) >= oneWeekAgo);
-  const lastWeekEntries = moodEntries.filter(entry =>
-    new Date(entry.created_at) >= twoWeeksAgo && new Date(entry.created_at) < oneWeekAgo
+  const thisWeekEntries = moodEntries.filter((entry) => new Date(entry.created_at) >= oneWeekAgo);
+  const lastWeekEntries = moodEntries.filter(
+    (entry) => new Date(entry.created_at) >= twoWeeksAgo && new Date(entry.created_at) < oneWeekAgo
   );
 
-  const thisWeekAvg = thisWeekEntries.length > 0
-    ? thisWeekEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / thisWeekEntries.length
-    : 0;
-  const lastWeekAvg = lastWeekEntries.length > 0
-    ? lastWeekEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / lastWeekEntries.length
-    : 0;
+  const thisWeekAvg =
+    thisWeekEntries.length > 0
+      ? thisWeekEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / thisWeekEntries.length
+      : 0;
+  const lastWeekAvg =
+    lastWeekEntries.length > 0
+      ? lastWeekEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / lastWeekEntries.length
+      : 0;
 
-  const weeklyTrend = thisWeekAvg > lastWeekAvg + 0.5 ? 'up' :
-                     thisWeekAvg < lastWeekAvg - 0.5 ? 'down' : 'stable';
+  const weeklyTrend =
+    thisWeekAvg > lastWeekAvg + 0.5 ? 'up' : thisWeekAvg < lastWeekAvg - 0.5 ? 'down' : 'stable';
 
   // Best day this week
   const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   let bestDayScore = 0;
   let bestDay = '';
 
-  thisWeekEntries.forEach(entry => {
+  thisWeekEntries.forEach((entry) => {
     if (entry.mood_score > bestDayScore) {
       bestDayScore = entry.mood_score;
       bestDay = weekDays[new Date(entry.created_at).getDay()];
@@ -151,88 +161,133 @@ const calculateEnhancedAnalytics = (moodEntries: MoodEntry[]): EnhancedAnalytics
   });
 
   // Energy analysis
-  const energyEntries = moodEntries.filter(entry => entry.energy_level);
-  const avgEnergy = energyEntries.length > 0
-    ? Math.round((energyEntries.reduce((sum, entry) => sum + (entry.energy_level || 0), 0) / energyEntries.length) * 10) / 10
-    : 0;
+  const energyEntries = moodEntries.filter((entry) => entry.energy_level);
+  const avgEnergy =
+    energyEntries.length > 0
+      ? Math.round(
+          (energyEntries.reduce((sum, entry) => sum + (entry.energy_level || 0), 0) /
+            energyEntries.length) *
+            10
+        ) / 10
+      : 0;
 
   const recentEnergyEntries = energyEntries.slice(0, 5);
   const olderEnergyEntries = energyEntries.slice(5, 10);
-  const recentEnergyAvg = recentEnergyEntries.length > 0
-    ? recentEnergyEntries.reduce((sum, entry) => sum + (entry.energy_level || 0), 0) / recentEnergyEntries.length
-    : 0;
-  const olderEnergyAvg = olderEnergyEntries.length > 0
-    ? olderEnergyEntries.reduce((sum, entry) => sum + (entry.energy_level || 0), 0) / olderEnergyEntries.length
-    : 0;
+  const recentEnergyAvg =
+    recentEnergyEntries.length > 0
+      ? recentEnergyEntries.reduce((sum, entry) => sum + (entry.energy_level || 0), 0) /
+        recentEnergyEntries.length
+      : 0;
+  const olderEnergyAvg =
+    olderEnergyEntries.length > 0
+      ? olderEnergyEntries.reduce((sum, entry) => sum + (entry.energy_level || 0), 0) /
+        olderEnergyEntries.length
+      : 0;
 
-  const energyTrend = recentEnergyAvg > olderEnergyAvg + 0.5 ? 'up' :
-                     recentEnergyAvg < olderEnergyAvg - 0.5 ? 'down' : 'stable';
+  const energyTrend =
+    recentEnergyAvg > olderEnergyAvg + 0.5
+      ? 'up'
+      : recentEnergyAvg < olderEnergyAvg - 0.5
+        ? 'down'
+        : 'stable';
 
   // Wellness score calculation
-  const avgMood = moodEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / moodEntries.length;
-  const stressEntries = moodEntries.filter(entry => entry.stress_level);
-  const avgStress = stressEntries.length > 0
-    ? stressEntries.reduce((sum, entry) => sum + (entry.stress_level || 0), 0) / stressEntries.length
-    : 5;
+  const avgMood =
+    moodEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / moodEntries.length;
+  const stressEntries = moodEntries.filter((entry) => entry.stress_level);
+  const avgStress =
+    stressEntries.length > 0
+      ? stressEntries.reduce((sum, entry) => sum + (entry.stress_level || 0), 0) /
+        stressEntries.length
+      : 5;
 
-  const wellnessScore = Math.round(((avgMood * 0.4) + (avgEnergy * 0.3) + ((10 - avgStress) * 0.3)) * 10) / 10;
-  const wellnessLevel = wellnessScore >= 8 ? 'excellent' :
-                       wellnessScore >= 6.5 ? 'good' :
-                       wellnessScore >= 5 ? 'fair' : 'poor';
+  const wellnessScore =
+    Math.round((avgMood * 0.4 + avgEnergy * 0.3 + (10 - avgStress) * 0.3) * 10) / 10;
+  const wellnessLevel =
+    wellnessScore >= 8
+      ? 'excellent'
+      : wellnessScore >= 6.5
+        ? 'good'
+        : wellnessScore >= 5
+          ? 'fair'
+          : 'poor';
 
   // Goal progress (assuming goal is to maintain mood above 7)
-  const goodMoodEntries = moodEntries.filter(entry => entry.mood_score >= 7);
+  const goodMoodEntries = moodEntries.filter((entry) => entry.mood_score >= 7);
   const goalProgress = Math.round((goodMoodEntries.length / moodEntries.length) * 100);
   const goalTrend = thisWeekAvg >= 7 ? 'up' : 'down';
 
   // Time of day analysis
-  const morningEntries = moodEntries.filter(entry => {
+  const morningEntries = moodEntries.filter((entry) => {
     const hour = new Date(entry.created_at).getHours();
     return hour >= 6 && hour < 12;
   });
-  const afternoonEntries = moodEntries.filter(entry => {
+  const afternoonEntries = moodEntries.filter((entry) => {
     const hour = new Date(entry.created_at).getHours();
     return hour >= 12 && hour < 18;
   });
-  const eveningEntries = moodEntries.filter(entry => {
+  const eveningEntries = moodEntries.filter((entry) => {
     const hour = new Date(entry.created_at).getHours();
     return hour >= 18 || hour < 6;
   });
 
-  const morningAvg = morningEntries.length > 0
-    ? Math.round((morningEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / morningEntries.length) * 10) / 10
-    : undefined;
-  const afternoonAvg = afternoonEntries.length > 0
-    ? Math.round((afternoonEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / afternoonEntries.length) * 10) / 10
-    : undefined;
-  const eveningAvg = eveningEntries.length > 0
-    ? Math.round((eveningEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / eveningEntries.length) * 10) / 10
-    : undefined;
+  const morningAvg =
+    morningEntries.length > 0
+      ? Math.round(
+          (morningEntries.reduce((sum, entry) => sum + entry.mood_score, 0) /
+            morningEntries.length) *
+            10
+        ) / 10
+      : undefined;
+  const afternoonAvg =
+    afternoonEntries.length > 0
+      ? Math.round(
+          (afternoonEntries.reduce((sum, entry) => sum + entry.mood_score, 0) /
+            afternoonEntries.length) *
+            10
+        ) / 10
+      : undefined;
+  const eveningAvg =
+    eveningEntries.length > 0
+      ? Math.round(
+          (eveningEntries.reduce((sum, entry) => sum + entry.mood_score, 0) /
+            eveningEntries.length) *
+            10
+        ) / 10
+      : undefined;
 
   const timeAverages = [
     { time: 'morning', avg: morningAvg || 0 },
     { time: 'afternoon', avg: afternoonAvg || 0 },
-    { time: 'evening', avg: eveningAvg || 0 }
+    { time: 'evening', avg: eveningAvg || 0 },
   ];
   const bestTimeOfDay = timeAverages.reduce((best, current) =>
     current.avg > best.avg ? current : best
   ).time;
 
   // Sleep impact analysis
-  const sleepEntries = moodEntries.filter(entry => entry.sleep_hours);
+  const sleepEntries = moodEntries.filter((entry) => entry.sleep_hours);
   let sleepImpact: 'positive' | 'negative' | 'neutral' | undefined;
   if (sleepEntries.length >= 3) {
-    const goodSleepEntries = sleepEntries.filter(entry => (entry.sleep_hours || 0) >= 7);
-    const goodSleepMoodAvg = goodSleepEntries.length > 0
-      ? goodSleepEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / goodSleepEntries.length
-      : 0;
-    const poorSleepEntries = sleepEntries.filter(entry => (entry.sleep_hours || 0) < 7);
-    const poorSleepMoodAvg = poorSleepEntries.length > 0
-      ? poorSleepEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / poorSleepEntries.length
-      : 0;
+    const goodSleepEntries = sleepEntries.filter((entry) => (entry.sleep_hours || 0) >= 7);
+    const goodSleepMoodAvg =
+      goodSleepEntries.length > 0
+        ? goodSleepEntries.reduce((sum, entry) => sum + entry.mood_score, 0) /
+          goodSleepEntries.length
+        : 0;
+    const poorSleepEntries = sleepEntries.filter((entry) => (entry.sleep_hours || 0) < 7);
+    const poorSleepMoodAvg =
+      poorSleepEntries.length > 0
+        ? poorSleepEntries.reduce((sum, entry) => sum + entry.mood_score, 0) /
+          poorSleepEntries.length
+        : 0;
 
-    sleepImpact = goodSleepMoodAvg > poorSleepMoodAvg + 0.5 ? 'positive' :
-                  goodSleepMoodAvg < poorSleepMoodAvg - 0.5 ? 'negative' : 'neutral';
+    sleepImpact =
+      goodSleepMoodAvg > poorSleepMoodAvg + 0.5
+        ? 'positive'
+        : goodSleepMoodAvg < poorSleepMoodAvg - 0.5
+          ? 'negative'
+          : 'neutral';
   }
 
   // Generate recommendation
@@ -267,7 +322,7 @@ const calculateEnhancedAnalytics = (moodEntries: MoodEntry[]): EnhancedAnalytics
     sleepImpact,
     stressCorrelation: avgStress > 7 ? 'high' : avgStress > 4 ? 'medium' : 'low',
     energySync: Math.abs(avgMood - avgEnergy) < 1 ? 'aligned' : 'misaligned',
-    topRecommendation
+    topRecommendation,
   };
 };
 
@@ -384,7 +439,11 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
                   {analytics.avgEnergy > 0 ? `${analytics.avgEnergy}/10` : 'N/A'}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {analytics.energyTrend === 'up' ? '↗ Increasing' : analytics.energyTrend === 'down' ? '↘ Decreasing' : '→ Stable'}
+                  {analytics.energyTrend === 'up'
+                    ? '↗ Increasing'
+                    : analytics.energyTrend === 'down'
+                      ? '↘ Decreasing'
+                      : '→ Stable'}
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
@@ -404,9 +463,16 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
                   {analytics.wellnessScore}
                 </p>
                 <div className="flex items-center gap-1 mt-1">
-                  <Badge variant={analytics.wellnessLevel === 'excellent' ? 'default' :
-                                analytics.wellnessLevel === 'good' ? 'secondary' : 'outline'}
-                         className="text-xs">
+                  <Badge
+                    variant={
+                      analytics.wellnessLevel === 'excellent'
+                        ? 'default'
+                        : analytics.wellnessLevel === 'good'
+                          ? 'secondary'
+                          : 'outline'
+                    }
+                    className="text-xs"
+                  >
                     {analytics.wellnessLevel}
                   </Badge>
                 </div>
@@ -421,7 +487,7 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
             Overview
@@ -433,10 +499,6 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
           <TabsTrigger value="insights" className="flex items-center gap-2">
             <Brain className="h-4 w-4" />
             Insights
-          </TabsTrigger>
-          <TabsTrigger value="timeline" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Timeline
           </TabsTrigger>
         </TabsList>
 
@@ -493,16 +555,32 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
                   <div>
                     <p className="text-2xl font-bold">{analytics.weeklyAverage || 'N/A'}</p>
                     <p className="text-sm text-muted-foreground">
-                      {analytics.weeklyTrend === 'up' ? '↗ Improving' :
-                       analytics.weeklyTrend === 'down' ? '↘ Declining' : '→ Stable'}
+                      {analytics.weeklyTrend === 'up'
+                        ? '↗ Improving'
+                        : analytics.weeklyTrend === 'down'
+                          ? '↘ Declining'
+                          : '→ Stable'}
                     </p>
                   </div>
                   <div className="text-3xl">
-                    {analytics.weeklyAverage ? getMoodEmoji(Math.round(analytics.weeklyAverage)) : '📊'}
+                    {analytics.weeklyAverage
+                      ? getMoodEmoji(Math.round(analytics.weeklyAverage))
+                      : '📊'}
                   </div>
                 </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Recent Mood Entries Timeline */}
+          <div className="space-y-4">
+            <RecentMoods
+              moodEntries={moodEntries}
+              hasMore={hasMore}
+              loadingMore={loadingMore}
+              totalCount={totalCount}
+              onLoadMore={loadMore}
+            />
           </div>
         </TabsContent>
 
@@ -531,27 +609,6 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
 
         <TabsContent value="insights" className="space-y-6">
           <MoodInsights moodEntries={moodEntries} />
-        </TabsContent>
-
-        <TabsContent value="timeline" className="space-y-6">
-          {/* Recent Mood Entries Timeline */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-semibold tracking-tight">Recent Mood Entries</h2>
-              <p className="text-muted-foreground">
-                {viewMode === 'personal'
-                  ? 'Your latest mood recordings'
-                  : 'Latest mood recordings from all users'}
-              </p>
-            </div>
-            <RecentMoods
-              moodEntries={moodEntries}
-              hasMore={hasMore}
-              loadingMore={loadingMore}
-              totalCount={totalCount}
-              onLoadMore={loadMore}
-            />
-          </div>
         </TabsContent>
       </Tabs>
 
