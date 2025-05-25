@@ -59,10 +59,12 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-blue-500" />
-            How to Use InboxInsights
+            Getting Started
           </SheetTitle>
           <SheetDescription>
-            Complete guide to tracking and analyzing your mood data
+            InboxInsights is a mood tracking application that allows you to monitor your emotional
+            well-being through data visualization. You can input mood data via email and view
+            comprehensive analytics on your dashboard.
           </SheetDescription>
         </SheetHeader>
 
@@ -71,24 +73,16 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Info className="h-4 w-4 text-blue-500" />
-              <h3 className="text-lg font-semibold">Getting Started</h3>
+              <h3 className="text-lg font-semibold">Key Features</h3>
             </div>
             <div className="space-y-3 text-sm">
-              <p className="text-muted-foreground">
-                InboxInsights is a mood tracking application that allows you to monitor your
-                emotional well-being through data visualization. You can input mood data via email
-                and view comprehensive analytics on your dashboard.
-              </p>
-              <div>
-                <h4 className="font-medium mb-2">Key Features:</h4>
-                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  <li>Email-based mood data ingestion</li>
-                  <li>Interactive mood charts and trends</li>
-                  <li>Personal and global mood views</li>
-                  <li>Real-time dashboard updates</li>
-                  <li>Mood statistics and insights</li>
-                </ul>
-              </div>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                <li>Email-based mood data ingestion</li>
+                <li>Interactive mood charts and trends</li>
+                <li>Personal and global mood views</li>
+                <li>Real-time dashboard updates</li>
+                <li>Mood statistics and insights</li>
+              </ul>
             </div>
           </div>
 
