@@ -205,29 +205,29 @@ export function RecentMoods({
 
   return (
     <div className="relative">
-      {/* Timeline line */}
-      <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gradient-to-b from-border via-border to-transparent"></div>
+      {/* Timeline line - responsive positioning */}
+      <div className="absolute left-4 sm:left-6 top-6 bottom-6 w-0.5 bg-gradient-to-b from-border via-border to-transparent"></div>
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {displayedEntries.map((entry) => (
-          <div key={entry.id} className="relative flex items-start gap-6">
-            {/* Timeline dot */}
+          <div key={entry.id} className="relative flex items-start gap-3 sm:gap-6">
+            {/* Timeline dot - responsive sizing */}
             <div className="relative z-10 flex-shrink-0">
-              <div className="w-12 h-12 rounded-full bg-background border-2 border-border flex items-center justify-center text-2xl shadow-md hover:shadow-lg transition-shadow duration-200">
+              <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-background border-2 border-border flex items-center justify-center text-lg sm:text-2xl shadow-md hover:shadow-lg transition-shadow duration-200">
                 {moodEmojis[entry.mood_score as keyof typeof moodEmojis]}
               </div>
             </div>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0 pb-6">
-              <div className="bg-card rounded-lg border p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-border/80">
+            {/* Content - improved mobile spacing */}
+            <div className="flex-1 min-w-0 pb-4 sm:pb-6">
+              <div className="bg-card rounded-lg border p-3 sm:p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-border/80">
                 <div className="space-y-4">
-                  {/* Header with time and action buttons */}
-                  <div className="flex items-center justify-between gap-2">
+                  {/* Header with time and action buttons - improved mobile layout */}
+                  <div className="flex items-start justify-between gap-2 flex-wrap sm:flex-nowrap">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="text-sm text-muted-foreground font-medium cursor-help">
+                          <span className="text-xs sm:text-sm text-muted-foreground font-medium cursor-help">
                             {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
                           </span>
                         </TooltipTrigger>
@@ -239,20 +239,21 @@ export function RecentMoods({
                       </Tooltip>
                     </TooltipProvider>
 
-                    <div className="flex items-center gap-1">
-                      {/* Raw Data Sheet */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* Raw Data Sheet - improved mobile button */}
                       <Sheet>
                         <SheetTrigger asChild>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-auto p-0 text-muted-foreground hover:text-foreground text-xs p-1"
+                            className="h-8 px-2 text-muted-foreground hover:text-foreground text-xs gap-1 min-w-0"
                           >
-                            Show Raw Data
-                            <FileText className="h-3 w-3" />
+                            <span className="hidden sm:inline">Show Raw Data</span>
+                            <span className="sm:hidden">Raw</span>
+                            <FileText className="h-3 w-3 flex-shrink-0" />
                           </Button>
                         </SheetTrigger>
-                        <SheetContent className="w-[500px] sm:w-[700px] sm:max-w-[700px] overflow-y-auto">
+                        <SheetContent className="w-full sm:w-[500px] sm:max-w-[700px] overflow-y-auto">
                           <SheetHeader>
                             <SheetTitle>Raw Entry Data</SheetTitle>
                             <SheetDescription>
@@ -272,27 +273,27 @@ export function RecentMoods({
                               </div>
                             )}
 
-                            {/* Raw Data Fields */}
+                            {/* Raw Data Fields - improved mobile layout */}
                             <div>
                               <h4 className="text-sm font-medium mb-2">Raw Data</h4>
                               <div className="space-y-2 text-sm">
                                 {/* Core Fields */}
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                                   <span className="font-medium">ID:</span>
-                                  <span className="font-mono text-xs">{entry.id}</span>
+                                  <span className="font-mono text-xs break-all">{entry.id}</span>
                                 </div>
 
                                 {entry.email_entry_id && (
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                                     <span className="font-medium">Email Entry ID:</span>
-                                    <span className="font-mono text-xs">
+                                    <span className="font-mono text-xs break-all">
                                       {entry.email_entry_id}
                                     </span>
                                   </div>
                                 )}
 
                                 {entry.subject && (
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                                     <span className="font-medium">Subject:</span>
                                     <span className="text-xs break-words">
                                       {escapeHtml(entry.subject)}
@@ -301,13 +302,13 @@ export function RecentMoods({
                                 )}
 
                                 {/* Mood Data */}
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                                   <span className="font-medium">Mood Score:</span>
                                   <span className="font-mono text-xs">{entry.mood_score}/10</span>
                                 </div>
 
                                 {entry.energy_level && (
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                                     <span className="font-medium">Energy Level:</span>
                                     <span className="font-mono text-xs">
                                       {entry.energy_level}/10
@@ -316,7 +317,7 @@ export function RecentMoods({
                                 )}
 
                                 {entry.stress_level && (
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                                     <span className="font-medium">Stress Level:</span>
                                     <span className="font-mono text-xs">
                                       {entry.stress_level}/10
@@ -325,7 +326,7 @@ export function RecentMoods({
                                 )}
 
                                 {entry.sleep_hours && (
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                                     <span className="font-medium">Sleep Hours:</span>
                                     <span className="font-mono text-xs">{entry.sleep_hours}h</span>
                                   </div>
@@ -333,7 +334,7 @@ export function RecentMoods({
 
                                 {/* Text Fields */}
                                 {entry.note && (
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-1 gap-1 sm:gap-2">
                                     <span className="font-medium">Note:</span>
                                     <span className="text-xs break-words">
                                       {escapeHtml(entry.note)}
@@ -342,14 +343,14 @@ export function RecentMoods({
                                 )}
 
                                 {entry.weather && (
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                                     <span className="font-medium">Weather:</span>
                                     <span className="text-xs">{escapeHtml(entry.weather)}</span>
                                   </div>
                                 )}
 
                                 {entry.activity && (
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-1 gap-1 sm:gap-2">
                                     <span className="font-medium">Activity:</span>
                                     <span className="text-xs break-words">
                                       {escapeHtml(entry.activity)}
@@ -358,22 +359,26 @@ export function RecentMoods({
                                 )}
 
                                 {/* Source Information */}
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                                   <span className="font-medium">From:</span>
-                                  <span className="font-mono text-xs">{entry.from || 'N/A'}</span>
+                                  <span className="font-mono text-xs break-all">
+                                    {entry.from || 'N/A'}
+                                  </span>
                                 </div>
 
                                 {entry.from_name && (
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                                     <span className="font-medium">From Name:</span>
                                     <span className="font-mono text-xs">{entry.from_name}</span>
                                   </div>
                                 )}
 
                                 {/* Timestamps */}
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="grid grid-cols-1 gap-1 sm:gap-2">
                                   <span className="font-medium">Created At:</span>
-                                  <span className="font-mono text-xs">{entry.created_at}</span>
+                                  <span className="font-mono text-xs break-all">
+                                    {entry.created_at}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -388,7 +393,7 @@ export function RecentMoods({
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-auto p-0 text-muted-foreground hover:text-red-600 text-xs p-1"
+                              className="h-8 px-2 text-muted-foreground hover:text-red-600 text-xs min-w-0"
                               disabled={deletingEntryId === entry.id}
                             >
                               <Trash2 className="h-3 w-3" />
@@ -418,62 +423,69 @@ export function RecentMoods({
                     </div>
                   </div>
 
-                  {/* Unified Badge Section */}
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {/* Mood badge - always first */}
+                  {/* Unified Badge Section - improved mobile layout */}
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-1">
+                    {/* Mood badge - always first, responsive sizing */}
                     <span
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium border ${getMoodColor(entry.mood_score)}`}
+                      className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium border ${getMoodColor(entry.mood_score)}`}
                     >
-                      {entry.mood_score}/10 -{' '}
-                      {moodLabels[entry.mood_score as keyof typeof moodLabels]}
+                      <span className="sm:hidden">{entry.mood_score}/10</span>
+                      <span className="hidden sm:inline">
+                        {entry.mood_score}/10 -{' '}
+                        {moodLabels[entry.mood_score as keyof typeof moodLabels]}
+                      </span>
                     </span>
 
-                    {/* Additional metrics */}
+                    {/* Additional metrics - responsive sizing */}
                     {entry.energy_level && (
-                      <span className="bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full text-xs font-medium">
-                        ⚡ Energy: {entry.energy_level}/10
+                      <span className="bg-blue-50 text-blue-700 border border-blue-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
+                        <span className="sm:hidden">⚡{entry.energy_level}</span>
+                        <span className="hidden sm:inline">⚡ Energy: {entry.energy_level}/10</span>
                       </span>
                     )}
                     {entry.stress_level && (
-                      <span className="bg-orange-50 text-orange-700 border border-orange-200 px-3 py-1.5 rounded-full text-xs font-medium">
-                        😰 Stress: {entry.stress_level}/10
+                      <span className="bg-orange-50 text-orange-700 border border-orange-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
+                        <span className="sm:hidden">😰{entry.stress_level}</span>
+                        <span className="hidden sm:inline">😰 Stress: {entry.stress_level}/10</span>
                       </span>
                     )}
                     {entry.sleep_hours && (
-                      <span className="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-full text-xs font-medium">
-                        😴 Sleep: {entry.sleep_hours}h
+                      <span className="bg-purple-50 text-purple-700 border border-purple-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
+                        <span className="sm:hidden">😴{entry.sleep_hours}h</span>
+                        <span className="hidden sm:inline">😴 Sleep: {entry.sleep_hours}h</span>
                       </span>
                     )}
                     {entry.weather && (
-                      <span className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-3 py-1.5 rounded-full text-xs font-medium">
-                        🌤️ {entry.weather}
+                      <span className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
+                        <span className="sm:hidden">🌤️</span>
+                        <span className="hidden sm:inline">🌤️ {entry.weather}</span>
                       </span>
                     )}
                   </div>
 
-                  {/* Chat Conversation */}
+                  {/* Chat Conversation - improved mobile layout */}
                   {(entry.activity || entry.note) && (
-                    <div className="space-y-3 pl-6">
+                    <div className="space-y-3 pl-2 sm:pl-6">
                       {/* User Message */}
                       {entry.activity && (
-                        <div className="flex items-start gap-3">
-                          {/* Avatar */}
-                          <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center border border-gray-300 dark:border-gray-600">
-                            <span className="text-sm">👤</span>
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          {/* Avatar - responsive sizing */}
+                          <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center border border-gray-300 dark:border-gray-600">
+                            <span className="text-xs sm:text-sm">👤</span>
                           </div>
 
-                          {/* Chat bubble */}
-                          <div className="flex-1 max-w-[85%]">
-                            <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 border border-gray-200 dark:border-gray-700">
+                          {/* Chat bubble - improved mobile responsiveness */}
+                          <div className="flex-1 max-w-[90%] sm:max-w-[85%]">
+                            <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 dark:border-gray-700">
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
                                   {entry.from_name || entry.from || 'User'}
                                 </span>
-                                <span className="text-xs text-gray-400 dark:text-gray-500">
+                                <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline">
                                   Message Resume
                                 </span>
                               </div>
-                              <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
+                              <p className="text-xs sm:text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
                                 {entry.activity}
                               </p>
                             </div>
@@ -481,26 +493,26 @@ export function RecentMoods({
                         </div>
                       )}
 
-                      {/* Aura Response */}
+                      {/* Aura Response - improved mobile layout */}
                       {entry.note && (
-                        <div className="flex items-start gap-3">
-                          {/* Avatar */}
-                          <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center border border-gray-300 dark:border-gray-600">
-                            <span className="text-sm">🤖</span>
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          {/* Avatar - responsive sizing */}
+                          <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center border border-gray-300 dark:border-gray-600">
+                            <span className="text-xs sm:text-sm">🤖</span>
                           </div>
 
-                          {/* Chat bubble */}
-                          <div className="flex-1 max-w-[85%]">
-                            <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 border border-gray-200 dark:border-gray-700">
+                          {/* Chat bubble - improved mobile responsiveness */}
+                          <div className="flex-1 max-w-[90%] sm:max-w-[85%]">
+                            <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 dark:border-gray-700">
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
                                   Aura
                                 </span>
-                                <span className="text-xs text-gray-400 dark:text-gray-500">
+                                <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline">
                                   AI Assistant
                                 </span>
                               </div>
-                              <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
+                              <p className="text-xs sm:text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
                                 {entry.note}
                               </p>
                             </div>
@@ -516,17 +528,17 @@ export function RecentMoods({
         ))}
       </div>
 
-      {/* Load More Section */}
+      {/* Load More Section - improved mobile layout */}
       {canShowMore && (
-        <div className="text-center pt-6 space-y-4">
-          <div className="text-sm text-muted-foreground">
+        <div className="text-center pt-4 sm:pt-6 space-y-3 sm:space-y-4">
+          <div className="text-xs sm:text-sm text-muted-foreground">
             Showing {displayedEntries.length} out of {totalCount} total entries
           </div>
           <Button
             variant="outline"
             onClick={handleLoadMore}
             disabled={loadingMore}
-            className="min-w-[120px]"
+            className="min-w-[120px] h-10 sm:h-auto"
           >
             {loadingMore ? (
               <>
@@ -542,7 +554,7 @@ export function RecentMoods({
 
       {/* Show total count when all entries are displayed */}
       {!canShowMore && totalCount > 0 && (
-        <div className="text-center text-sm text-muted-foreground pt-4">
+        <div className="text-center text-xs sm:text-sm text-muted-foreground pt-3 sm:pt-4">
           All {totalCount} entries displayed
         </div>
       )}
