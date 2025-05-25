@@ -23,10 +23,8 @@ interface MoodMeterDashboardProps {
 
 export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
-  const { moodEntries, loading, loadingMore, error, hasMore, totalCount, refetch, loadMore } = useMoodEntries(
-    initialMoodEntries,
-    viewMode
-  );
+  const { moodEntries, loading, loadingMore, error, hasMore, totalCount, refetch, loadMore } =
+    useMoodEntries(initialMoodEntries, viewMode);
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">

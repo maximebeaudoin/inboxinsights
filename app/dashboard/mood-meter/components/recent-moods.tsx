@@ -100,6 +100,7 @@ export function RecentMoods({
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null);
   const [displayCount, setDisplayCount] = useState<number>(PAGINATION_CONFIG.INITIAL_DISPLAY_COUNT);
   const [canDeleteMap, setCanDeleteMap] = useState<Record<string, boolean>>({});
+  const [lastTotalCount, setLastTotalCount] = useState(totalCount);
   const { toast } = useToast();
 
   const supabase = useMemo(() => createClient(), []);
@@ -161,21 +162,28 @@ export function RecentMoods({
 
   const handleLoadMore = () => {
     const remainingEntries = moodEntries.length - displayCount;
-    const nextBatch = Math.min(PAGINATION_CONFIG.LOAD_MORE_DISPLAY_COUNT, remainingEntries);
 
-    if (nextBatch > 0) {
+    if (remainingEntries > 0) {
       // Show more from already loaded entries
+      const nextBatch = Math.min(PAGINATION_CONFIG.LOAD_MORE_DISPLAY_COUNT, remainingEntries);
       setDisplayCount((prev) => prev + nextBatch);
     } else if (hasMore && onLoadMore) {
-      // Load more from server
+      // Load more from server - this will automatically show the new entries
       onLoadMore();
     }
   };
 
-  // Reset display count when mood entries change (e.g., view mode switch)
+  // Handle when new data is loaded from server
   useEffect(() => {
-    setDisplayCount(PAGINATION_CONFIG.INITIAL_DISPLAY_COUNT);
-  }, [moodEntries.length]);
+    if (totalCount !== lastTotalCount) {
+      // Total count changed, meaning we switched view modes or data was refreshed
+      setDisplayCount(PAGINATION_CONFIG.INITIAL_DISPLAY_COUNT);
+      setLastTotalCount(totalCount);
+    } else if (moodEntries.length > displayCount) {
+      // New entries were loaded, expand display to show them
+      setDisplayCount(moodEntries.length);
+    }
+  }, [moodEntries.length, totalCount, lastTotalCount, displayCount]);
 
   const displayedEntries = moodEntries.slice(0, displayCount);
   const canShowMore = displayCount < moodEntries.length || hasMore;

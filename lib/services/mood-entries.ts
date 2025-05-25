@@ -35,9 +35,7 @@ export class MoodEntriesService {
     }
 
     // Get total count with proper filtering
-    let countQuery = this.supabase
-      .from('mood_entries')
-      .select('*', { count: 'exact', head: true });
+    let countQuery = this.supabase.from('mood_entries').select('*', { count: 'exact', head: true });
 
     // Filter by user email only in personal mode
     if (viewMode === 'personal') {

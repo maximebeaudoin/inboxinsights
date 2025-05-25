@@ -91,22 +91,18 @@ export function useMoodEntries(
 
   // Initialize data
   useEffect(() => {
-    // On first load, if we have initial data and we're in personal mode, just mark as initialized
-    if (!hasInitialized && initialData.length > 0 && viewMode === 'personal') {
+    if (!hasInitialized) {
       setHasInitialized(true);
-      setCurrentOffset(initialData.length);
-      // We still need to get the total count even with initial data
+      // Always fetch fresh data to get accurate total count
       fetchMoodEntries();
-      return;
+    } else {
+      // View mode changed, fetch fresh data
+      setMoodEntries([]);
+      setCurrentOffset(0);
+      setTotalCount(0);
+      fetchMoodEntries();
     }
-
-    // For all other cases (view mode changes, no initial data, or global mode), fetch fresh data
-    setMoodEntries([]);
-    setCurrentOffset(0);
-    setTotalCount(0);
-    fetchMoodEntries();
-    setHasInitialized(true);
-  }, [fetchMoodEntries, viewMode, initialData.length, hasInitialized]);
+  }, [fetchMoodEntries, viewMode, hasInitialized]);
 
   // Set up real-time subscription
   useEffect(() => {
