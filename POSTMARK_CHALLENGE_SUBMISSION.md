@@ -96,7 +96,7 @@ The complete source code is available on GitHub with comprehensive documentation
 
 **InboxInsights** uses a modern, scalable architecture built around Postmark's inbound email processing:
 
-📊 **[View Complete Workflow Diagram →](https://github.com/maximebeaudoin/inboxinsights/blob/main/workflow.svg)**
+📊 **[View Complete Workflow Diagram →](https://raw.githubusercontent.com/maximebeaudoin/inboxinsights/refs/heads/main/workflow.svg)**
 
 The architecture consists of four main layers:
 
