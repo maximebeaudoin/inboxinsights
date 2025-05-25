@@ -223,6 +223,37 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
             </div>
           </div>
 
+          {/* Content Guidelines */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-red-500" />
+              <h3 className="text-lg font-semibold">Content Guidelines</h3>
+            </div>
+            <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/50">
+              <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+              <AlertTitle className="text-red-800 dark:text-red-200">Prohibited Content</AlertTitle>
+              <AlertDescription className="text-red-700 dark:text-red-300 text-xs">
+                <p className="mb-2">
+                  <strong>
+                    The following content types are strictly prohibited in mood tracking emails:
+                  </strong>
+                </p>
+                <ul className="space-y-1 list-disc list-inside">
+                  <li>Sexual content or themes</li>
+                  <li>Hate speech or discriminatory language</li>
+                  <li>Harassment or threatening behavior</li>
+                  <li>Self-harm content or instructions</li>
+                  <li>Violence or graphic content</li>
+                  <li>Content involving minors inappropriately</li>
+                  <li>Any other inappropriate or offensive material</li>
+                </ul>
+                <p className="mt-2">
+                  <strong>Violation of these guidelines may result in account suspension.</strong>
+                </p>
+              </AlertDescription>
+            </Alert>
+          </div>
+
           {/* Tips and Best Practices */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -259,6 +290,12 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
                   <span className="text-blue-500 mt-1 text-xs">•</span>
                   <span className="text-xs">
                     Use the dashboard insights to make informed decisions about your well-being
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-500 mt-1 text-xs">•</span>
+                  <span className="text-xs">
+                    Keep all content appropriate and respectful for a positive community experience
                   </span>
                 </li>
               </ul>

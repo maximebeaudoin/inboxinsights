@@ -11,6 +11,7 @@ import { DataIngestionInfo } from '@/components/data-ingestion-info';
 import { DemoCredentialsButton } from '@/components/demo-credentials-button';
 import { FormMessage, Message } from '@/components/form-message';
 import { InstructionsSheet } from '@/components/instructions-sheet';
+import { PrivacyContentNotice } from '@/components/privacy-content-notice';
 import { SubmitButton } from '@/components/submit-button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -48,15 +49,8 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-background to-muted/20">
       <div className="flex flex-col gap-6 max-w-6xl w-full">
-        {/* Privacy Disclaimer */}
-        <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/50">
-          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-          <AlertTitle className="text-amber-800 dark:text-amber-200">Privacy Notice</AlertTitle>
-          <AlertDescription className="text-amber-700 dark:text-amber-300">
-            <strong>Important:</strong> Some user data will be publicly visible, including your
-            email address, name, and email content. This is a public demo application.
-          </AlertDescription>
-        </Alert>
+        {/* Privacy & Content Policy */}
+        <PrivacyContentNotice />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Sign-in Form */}

@@ -8,6 +8,7 @@ import { useSearchParams } from 'next/navigation';
 import { AlertTriangle, Check, Eye, EyeOff, Lock, Mail, UserPlus, X } from 'lucide-react';
 
 import { FormMessage, Message } from '@/components/form-message';
+import { PrivacyContentNotice } from '@/components/privacy-content-notice';
 import { SubmitButton } from '@/components/submit-button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -76,15 +77,8 @@ export default function Signup() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-background to-muted/20">
       <div className="flex flex-col gap-6 w-full max-w-md">
-        {/* Privacy Disclaimer */}
-        <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/50">
-          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-          <AlertTitle className="text-amber-800 dark:text-amber-200">Privacy Notice</AlertTitle>
-          <AlertDescription className="text-amber-700 dark:text-amber-300">
-            <strong>Important:</strong> Some user data will be publicly visible, including your
-            email address, name, and email content. This is a public demo application.
-          </AlertDescription>
-        </Alert>
+        {/* Privacy & Content Policy */}
+        <PrivacyContentNotice />
 
         {/* Sign-up Form */}
         <div className="flex flex-col space-y-6">
