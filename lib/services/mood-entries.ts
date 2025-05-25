@@ -29,22 +29,41 @@ export class MoodEntriesService {
       return {
         data: [],
         hasMore: false,
+        total: 0,
         nextOffset: 0,
       };
     }
 
-    let query = this.supabase
+    // Get total count with proper filtering
+    let countQuery = this.supabase
+      .from('mood_entries')
+      .select('*', { count: 'exact', head: true });
+
+    // Filter by user email only in personal mode
+    if (viewMode === 'personal') {
+      countQuery = countQuery.eq('from', user.email);
+    }
+
+    const { count, error: countError } = await countQuery;
+
+    if (countError) {
+      console.error('Error fetching mood entries count:', countError);
+      throw new Error('Failed to fetch mood entries count');
+    }
+
+    // Get paginated data
+    let dataQuery = this.supabase
       .from('mood_entries')
       .select('*')
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
-    // Filter by user email only in personal mode
+    // Apply same filter for data query
     if (viewMode === 'personal') {
-      query = query.eq('from', user.email);
+      dataQuery = dataQuery.eq('from', user.email);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await dataQuery;
 
     if (error) {
       console.error('Error fetching mood entries:', error);
@@ -52,12 +71,14 @@ export class MoodEntriesService {
     }
 
     const entries = data || [];
-    const hasMore = entries.length === limit;
+    const total = count || 0;
+    const hasMore = entries.length === limit && offset + limit < total;
     const nextOffset = hasMore ? offset + limit : undefined;
 
     return {
       data: entries,
       hasMore,
+      total,
       nextOffset,
     };
   }

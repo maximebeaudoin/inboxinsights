@@ -14,6 +14,7 @@ interface UseMoodEntriesReturn {
   loadingMore: boolean;
   error: string | null;
   hasMore: boolean;
+  totalCount: number;
   refetch: () => Promise<void>;
   loadMore: () => Promise<void>;
 }
@@ -28,6 +29,7 @@ export function useMoodEntries(
   const [error, setError] = useState<string | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
   const [currentOffset, setCurrentOffset] = useState(0);
 
   const supabase = useMemo(() => createClient(), []);
@@ -46,6 +48,7 @@ export function useMoodEntries(
 
       setMoodEntries(result.data);
       setHasMore(result.hasMore);
+      setTotalCount(result.total);
       setCurrentOffset(result.nextOffset || 0);
     } catch (err) {
       console.error('Error in fetchMoodEntries:', err);
@@ -70,6 +73,7 @@ export function useMoodEntries(
 
       setMoodEntries((current) => [...current, ...result.data]);
       setHasMore(result.hasMore);
+      setTotalCount(result.total);
       setCurrentOffset(result.nextOffset || currentOffset);
     } catch (err) {
       console.error('Error in loadMore:', err);
@@ -81,6 +85,7 @@ export function useMoodEntries(
 
   const refetch = useCallback(async () => {
     setCurrentOffset(0);
+    setTotalCount(0);
     await fetchMoodEntries();
   }, [fetchMoodEntries]);
 
@@ -90,12 +95,15 @@ export function useMoodEntries(
     if (!hasInitialized && initialData.length > 0 && viewMode === 'personal') {
       setHasInitialized(true);
       setCurrentOffset(initialData.length);
+      // We still need to get the total count even with initial data
+      fetchMoodEntries();
       return;
     }
 
     // For all other cases (view mode changes, no initial data, or global mode), fetch fresh data
     setMoodEntries([]);
     setCurrentOffset(0);
+    setTotalCount(0);
     fetchMoodEntries();
     setHasInitialized(true);
   }, [fetchMoodEntries, viewMode, initialData.length, hasInitialized]);
@@ -111,6 +119,8 @@ export function useMoodEntries(
           const updated = [newEntry, ...current].slice(0, PAGINATION_CONFIG.MAX_ENTRIES_IN_MEMORY);
           return updated;
         });
+        // Increment total count when new entry is added
+        setTotalCount((current) => current + 1);
       },
       // onUpdate
       (updatedEntry) => {
@@ -121,6 +131,8 @@ export function useMoodEntries(
       // onDelete
       (deletedEntry) => {
         setMoodEntries((current) => current.filter((entry) => entry.id !== deletedEntry.id));
+        // Decrement total count when entry is deleted
+        setTotalCount((current) => Math.max(0, current - 1));
       }
     );
 
@@ -133,6 +145,7 @@ export function useMoodEntries(
     loadingMore,
     error,
     hasMore,
+    totalCount,
     refetch,
     loadMore,
   };

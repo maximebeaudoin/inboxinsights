@@ -6,7 +6,9 @@ This directory contains the centralized database service layer following Supabas
 
 ```
 lib/
-├── services/           # Database service classes
+├── config/            # Configuration constants
+│   └── pagination.ts  # Pagination settings
+├── services/          # Database service classes
 │   └── mood-entries.ts # Mood entries operations
 ├── supabase/          # Supabase utilities
 │   └── auth.ts        # Authentication helpers
@@ -35,12 +37,42 @@ lib/
 - Hooks handle React state management
 - Components focus on UI rendering
 
-### 4. **Supabase Best Practices**
+### 4. **Centralized Configuration**
+
+- Pagination settings in `lib/config/pagination.ts`
+- Consistent values across the application
+- Easy to modify and maintain
+
+### 5. **Supabase Best Practices**
 
 - Proper client/server separation
 - Efficient pagination with `range()`
 - Real-time subscriptions handled centrally
 - Authentication checks abstracted
+
+## Configuration
+
+### Pagination Settings
+
+All pagination-related constants are centralized in `lib/config/pagination.ts`:
+
+```typescript
+export const PAGINATION_CONFIG = {
+  // Number of mood entries to load per page/batch
+  MOOD_ENTRIES_PER_PAGE: 50,
+
+  // Number of mood entries to display initially in the UI
+  INITIAL_DISPLAY_COUNT: 10,
+
+  // Number of additional entries to show when "Load More" is clicked
+  LOAD_MORE_DISPLAY_COUNT: 10,
+
+  // Maximum number of entries to keep in memory for real-time updates
+  MAX_ENTRIES_IN_MEMORY: 200,
+} as const;
+```
+
+To modify pagination behavior, simply update these values in one place.
 
 ## Usage Examples
 

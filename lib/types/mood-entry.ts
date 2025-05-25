@@ -1,3 +1,5 @@
+import { PAGINATION_CONFIG } from '@/lib/config/pagination';
+
 // Centralized type definitions for mood entries
 export interface MoodEntry {
   id: string;
@@ -27,9 +29,12 @@ export interface MoodEntriesQuery {
 export interface MoodEntriesResponse {
   data: MoodEntry[];
   hasMore: boolean;
-  total?: number;
+  total: number;
 }
 
 export interface PaginatedMoodEntriesResponse extends MoodEntriesResponse {
   nextOffset?: number;
 }
+
+// Re-export pagination config for convenience
+export { PAGINATION_CONFIG };

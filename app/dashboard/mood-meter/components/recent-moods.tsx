@@ -42,6 +42,7 @@ interface RecentMoodsProps {
   moodEntries: MoodEntry[];
   hasMore?: boolean;
   loadingMore?: boolean;
+  totalCount?: number;
   onLoadMore?: () => void;
 }
 
@@ -93,10 +94,11 @@ export function RecentMoods({
   moodEntries,
   hasMore = false,
   loadingMore = false,
+  totalCount = 0,
   onLoadMore,
 }: RecentMoodsProps) {
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null);
-  const [displayCount, setDisplayCount] = useState(PAGINATION_CONFIG.INITIAL_DISPLAY_COUNT);
+  const [displayCount, setDisplayCount] = useState<number>(PAGINATION_CONFIG.INITIAL_DISPLAY_COUNT);
   const [canDeleteMap, setCanDeleteMap] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
@@ -510,8 +512,7 @@ export function RecentMoods({
       {canShowMore && (
         <div className="text-center pt-6 space-y-4">
           <div className="text-sm text-muted-foreground">
-            Showing {displayedEntries.length} out of {moodEntries.length} loaded entries
-            {hasMore && ' (more available)'}
+            Showing {displayedEntries.length} out of {totalCount} total entries
           </div>
           <Button
             variant="outline"
@@ -532,9 +533,9 @@ export function RecentMoods({
       )}
 
       {/* Show total count when all entries are displayed */}
-      {!canShowMore && moodEntries.length > 0 && (
+      {!canShowMore && totalCount > 0 && (
         <div className="text-center text-sm text-muted-foreground pt-4">
-          All {moodEntries.length} entries displayed
+          All {totalCount} entries displayed
         </div>
       )}
     </div>
