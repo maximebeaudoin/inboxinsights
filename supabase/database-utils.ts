@@ -6,6 +6,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+import type { CreateEmailViolation, EmailViolation } from '@/lib/types/email-violations';
 import type { MoodEntry } from '@/lib/types/mood-entry';
 
 /**
@@ -347,4 +348,243 @@ export async function getRecentEntries(
   }
 
   return data || [];
+}
+
+/**
+ * Email Violations Utilities
+ */
+
+/**
+ * Create a new email violation record
+ */
+export async function createEmailViolation(
+  supabase: SupabaseClient,
+  violation: CreateEmailViolation
+): Promise<EmailViolation> {
+  const { data, error } = await supabase
+    .from('email_violations')
+    .insert(violation)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to create email violation: ${error.message}`);
+  }
+
+  return data;
+}
+
+/**
+ * Get email violation by email_entry_id
+ */
+export async function getEmailViolation(
+  supabase: SupabaseClient,
+  emailEntryId: string
+): Promise<EmailViolation | null> {
+  const { data, error } = await supabase
+    .from('email_violations')
+    .select('*')
+    .eq('email_entry_id', emailEntryId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // No rows returned
+      return null;
+    }
+    throw new Error(`Failed to fetch email violation: ${error.message}`);
+  }
+
+  return data;
+}
+
+/**
+ * Get all flagged violations for a user
+ */
+export async function getFlaggedViolations(
+  supabase: SupabaseClient,
+  userEmail?: string,
+  limit: number = 50
+): Promise<EmailViolation[]> {
+  let query = supabase
+    .from('email_violations')
+    .select(
+      `
+      *,
+      mood_entry:mood_entries!email_violations_email_entry_id_fkey(
+        id,
+        from,
+        from_name,
+        original_text,
+        created_at
+      )
+    `
+    )
+    .eq('flagged', true)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (userEmail) {
+    // Filter by user email through the mood_entries relationship
+    query = query.eq('mood_entries.from', userEmail);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(`Failed to fetch flagged violations: ${error.message}`);
+  }
+
+  return data || [];
+}
+
+/**
+ * Update an existing email violation
+ */
+export async function updateEmailViolation(
+  supabase: SupabaseClient,
+  emailEntryId: string,
+  updates: Partial<CreateEmailViolation>
+): Promise<EmailViolation> {
+  const { data, error } = await supabase
+    .from('email_violations')
+    .update(updates)
+    .eq('email_entry_id', emailEntryId)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to update email violation: ${error.message}`);
+  }
+
+  return data;
+}
+
+/**
+ * Delete an email violation record
+ */
+export async function deleteEmailViolation(
+  supabase: SupabaseClient,
+  emailEntryId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('email_violations')
+    .delete()
+    .eq('email_entry_id', emailEntryId);
+
+  if (error) {
+    throw new Error(`Failed to delete email violation: ${error.message}`);
+  }
+}
+
+/**
+ * Get violation statistics
+ */
+export async function getViolationStats(
+  supabase: SupabaseClient,
+  userEmail?: string
+): Promise<{
+  totalViolations: number;
+  flaggedViolations: number;
+  categoryBreakdown: Record<string, number>;
+}> {
+  let query = supabase.from('email_violations').select('*');
+
+  if (userEmail) {
+    // Join with mood_entries to filter by user
+    query = supabase
+      .from('email_violations')
+      .select(
+        `
+        *,
+        mood_entries!email_violations_email_entry_id_fkey(from)
+      `
+      )
+      .eq('mood_entries.from', userEmail);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(`Failed to fetch violation stats: ${error.message}`);
+  }
+
+  if (!data || data.length === 0) {
+    return {
+      totalViolations: 0,
+      flaggedViolations: 0,
+      categoryBreakdown: {},
+    };
+  }
+
+  const totalViolations = data.length;
+  const flaggedViolations = data.filter((v) => v.flagged).length;
+
+  // Count violations by category
+  const categories = [
+    'sexual',
+    'hate',
+    'harassment',
+    'self_harm',
+    'sexual_minors',
+    'hate_threatening',
+    'violence_graphic',
+    'self_harm_intent',
+    'self_harm_instructions',
+    'harassment_threatening',
+    'violence',
+  ];
+
+  const categoryBreakdown: Record<string, number> = {};
+  categories.forEach((category) => {
+    categoryBreakdown[category] = data.filter((v) => v[category] === true).length;
+  });
+
+  return {
+    totalViolations,
+    flaggedViolations,
+    categoryBreakdown,
+  };
+}
+
+/**
+ * Validate email violation data before insertion
+ */
+export function validateEmailViolation(violation: Partial<CreateEmailViolation>): string[] {
+  const errors: string[] = [];
+
+  // Required fields
+  if (!violation.email_entry_id) {
+    errors.push('email_entry_id is required');
+  }
+
+  if (violation.flagged === undefined || violation.flagged === null) {
+    errors.push('flagged status is required');
+  }
+
+  // Validate score ranges (0.0 to 1.0)
+  const scoreFields = [
+    'sexual_score',
+    'hate_score',
+    'harassment_score',
+    'self_harm_score',
+    'sexual_minors_score',
+    'hate_threatening_score',
+    'violence_graphic_score',
+    'self_harm_intent_score',
+    'self_harm_instructions_score',
+    'harassment_threatening_score',
+    'violence_score',
+  ];
+
+  scoreFields.forEach((field) => {
+    const score = violation[field as keyof CreateEmailViolation] as number;
+    if (score !== undefined && score !== null) {
+      if (score < 0.0 || score > 1.0) {
+        errors.push(`${field} must be between 0.0 and 1.0`);
+      }
+    }
+  });
+
+  return errors;
 }

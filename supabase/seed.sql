@@ -1,4 +1,4 @@
--- Seed data for mood_entries table
+-- Seed data for mood_entries and email_violations tables
 -- This file contains sample data for testing and development
 -- Following Supabase best practices for seeding
 
@@ -1006,4 +1006,123 @@ Finally finished planning my vacation! Booked flights, hotels, and activities. T
     'demo@inboxinsights.me',
     'InboxInsights Demo',
     NOW() - INTERVAL '45 days'
+);
+
+-- Insert sample email violations data
+-- These examples demonstrate different violation scenarios for testing
+
+INSERT INTO public.email_violations (
+    id,
+    email_entry_id,
+    flagged,
+    sexual,
+    hate,
+    harassment,
+    self_harm,
+    sexual_minors,
+    hate_threatening,
+    violence_graphic,
+    self_harm_intent,
+    self_harm_instructions,
+    harassment_threatening,
+    violence,
+    sexual_score,
+    hate_score,
+    harassment_score,
+    self_harm_score,
+    sexual_minors_score,
+    hate_threatening_score,
+    violence_graphic_score,
+    self_harm_intent_score,
+    self_harm_instructions_score,
+    harassment_threatening_score,
+    violence_score,
+    created_at
+) VALUES
+-- Example 1: Flagged content with sexual violation (based on your data example)
+(
+    gen_random_uuid(),
+    (SELECT email_entry_id FROM public.mood_entries WHERE "from" = 'maxime.l.beaudoin@gmail.com' LIMIT 1),
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    0.8802841305732727,
+    0.0006304612034000456,
+    0.014191905967891216,
+    0.00011019206431228667,
+    0.00020739033061545342,
+    0.000003239655370634864,
+    0.00007828194065950811,
+    0.00016439051250922715,
+    0.000001022001242745318,
+    0.00012118071026634425,
+    0.00008665642235428095,
+    NOW() - INTERVAL '2 days'
+),
+-- Example 2: Clean content (no violations)
+(
+    gen_random_uuid(),
+    (SELECT email_entry_id FROM public.mood_entries WHERE "from" = 'demo@inboxinsights.me' LIMIT 1),
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    0.001234567890123456,
+    0.000987654321098765,
+    0.002345678901234567,
+    0.000567890123456789,
+    0.001098765432109876,
+    0.000234567890123456,
+    0.000789012345678901,
+    0.000345678901234567,
+    0.000123456789012345,
+    0.000456789012345678,
+    0.000678901234567890,
+    NOW() - INTERVAL '5 days'
+),
+-- Example 3: Multiple category violations
+(
+    gen_random_uuid(),
+    (SELECT email_entry_id FROM public.mood_entries WHERE "from" = 'demo.user@example.com' LIMIT 1),
+    true,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    0.012345678901234567,
+    0.567890123456789012,
+    0.456789012345678901,
+    0.023456789012345678,
+    0.001234567890123456,
+    0.000987654321098765,
+    0.012345678901234567,
+    0.003456789012345678,
+    0.000567890123456789,
+    0.004567890123456789,
+    0.034567890123456789,
+    NOW() - INTERVAL '8 days'
 );
