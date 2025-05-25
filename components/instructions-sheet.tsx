@@ -6,8 +6,6 @@ import {
   BookOpen,
   ExternalLink,
   Info,
-  Mail,
-  Send,
   TrendingUp,
   Users,
 } from 'lucide-react';
@@ -26,6 +24,8 @@ import {
 } from '@/components/ui/sheet';
 
 import { useToast } from '@/hooks/use-toast';
+
+import { DataIngestionInfo } from './data-ingestion-info';
 
 interface InstructionsSheetProps {
   children: React.ReactNode;
@@ -91,26 +91,7 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
           </div>
 
           {/* How to Send Mood Data */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Send className="h-4 w-4 text-green-500" />
-              <h3 className="text-lg font-semibold">How to Send Mood Data</h3>
-            </div>
-            <div className="space-y-3 text-sm">
-              <p className="text-muted-foreground">
-                Send an email with your mood data in the subject line or body. The system will
-                automatically process and categorize your mood information.
-              </p>
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle className="text-sm">Important Note</AlertTitle>
-                <AlertDescription className="text-xs">
-                  Make sure to send emails from the same email address you used to sign up for
-                  accurate mood tracking.
-                </AlertDescription>
-              </Alert>
-            </div>
-          </div>
+          <DataIngestionInfo />
 
           {/* Dashboard Features */}
           <div className="space-y-4">
@@ -161,11 +142,11 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
             </div>
           </div>
 
-          {/* Demo Account & Data Ingestion */}
+          {/* Demo Account */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Info className="h-4 w-4 text-orange-500" />
-              <h3 className="text-lg font-semibold">Demo Account & Data Ingestion</h3>
+              <h3 className="text-lg font-semibold">Demo Account</h3>
             </div>
 
             {/* Demo Credentials */}
@@ -203,32 +184,6 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
                     }}
                   />
                 </div>
-              </div>
-            </div>
-
-            {/* Data Ingestion */}
-            <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-              <h4 className="text-sm font-semibold flex items-center gap-2 text-blue-700 dark:text-blue-300">
-                <Send className="h-3 w-3" />
-                Data Ingestion Email
-              </h4>
-              <div className="space-y-2">
-                <Label className="text-xs font-medium flex items-center gap-2">
-                  <Mail className="h-3 w-3" />
-                  Send Data To:
-                </Label>
-                <Input
-                  value="b82ba9d30ef2dd7cf65016dfe8c69b37@inbound.postmarkapp.com"
-                  readOnly
-                  className="font-mono text-xs h-8 cursor-pointer"
-                  onClick={(e) => {
-                    e.currentTarget.select();
-                    handleCopy(e.currentTarget.value, 'Data ingestion email');
-                  }}
-                />
-                <p className="text-xs text-blue-600 dark:text-blue-400">
-                  Send your mood data to this email address for automatic processing
-                </p>
               </div>
             </div>
 

@@ -3,6 +3,7 @@
 import { format, formatDistanceToNow } from 'date-fns';
 import { FileText, Info } from 'lucide-react';
 
+import { DataIngestionInfo } from '@/components/data-ingestion-info';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -68,12 +69,15 @@ const getMoodColor = (score: number) => {
 export function RecentMoods({ moodEntries }: RecentMoodsProps) {
   if (moodEntries.length === 0) {
     return (
-      <div className="flex items-center justify-center h-32 text-muted-foreground">
-        <div className="text-center">
-          <div className="text-4xl mb-2">📝</div>
-          <p>No mood entries yet.</p>
-          <p className="text-sm">Add your first mood entry above!</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-32 text-muted-foreground">
+          <div className="text-center">
+            <div className="text-4xl mb-2">📝</div>
+            <p>No mood entries yet.</p>
+            <p className="text-sm">Start tracking your mood by sending an email!</p>
+          </div>
         </div>
+        <DataIngestionInfo variant="compact" />
       </div>
     );
   }

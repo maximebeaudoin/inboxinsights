@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { AlertTriangle, BookOpen, Lock, Mail } from 'lucide-react';
 
+import { DataIngestionInfo } from '@/components/data-ingestion-info';
 import { FormMessage, Message } from '@/components/form-message';
 import { InstructionsSheet } from '@/components/instructions-sheet';
 import { SubmitButton } from '@/components/submit-button';
@@ -127,6 +128,8 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                <DataIngestionInfo variant="compact" showTitle={false} />
+
                 <InstructionsSheet>
                   <Button className="w-full">
                     <BookOpen className="h-4 w-4 mr-2" />
