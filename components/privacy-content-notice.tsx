@@ -25,7 +25,8 @@ export function PrivacyContentNotice() {
           Content containing sexual themes, hate speech, harassment, self-harm, violence, threats,
           or any inappropriate material will be filtered since this is one of the key feature we
           want to showcase. However, Please keep all mood tracking content appropriate and
-          respectful.
+          respectful. You can also delete any mood entry you have created (except for the demo
+          user).
         </AlertDescription>
       </Alert>
     </div>
