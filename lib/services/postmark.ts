@@ -32,11 +32,11 @@ export class PostmarkService {
         TextBody: message,
         Tag: 'test-mood-email',
         TrackOpens: false,
-        TrackLinks: 'None',
+
         MessageStream: 'outbound',
       });
 
-      console.log('✅ Postmark email sent successfully:', {
+      console.warn('✅ Postmark email sent successfully:', {
         MessageID: result.MessageID,
         To: result.To,
         SubmittedAt: result.SubmittedAt,

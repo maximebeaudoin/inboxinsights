@@ -1,9 +1,21 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
-import { addDays, format, isSameDay, startOfWeek, subWeeks } from 'date-fns';
+import {
+  addDays,
+  addMonths,
+  endOfMonth,
+  format,
+  isSameDay,
+  isSameMonth,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from 'date-fns';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -39,146 +51,171 @@ const getMoodEmoji = (score: number | null): string => {
 };
 
 export function MoodHeatmap({ moodEntries }: MoodHeatmapProps) {
-  const heatmapData = useMemo(() => {
-    const weeks = [];
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const calendarData = useMemo(() => {
     const today = new Date();
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 }); // Sunday start
+    const calendarEnd = addDays(calendarStart, 34); // 5 weeks (35 days)
 
-    // Generate last 12 weeks
-    for (let i = 11; i >= 0; i--) {
-      const weekStart = startOfWeek(subWeeks(today, i), { weekStartsOn: 1 }); // Monday start
-      const week = [];
+    const days = [];
+    let day = calendarStart;
 
-      for (let j = 0; j < 7; j++) {
-        const date = addDays(weekStart, j);
-        const dayEntry = moodEntries.find((entry) => isSameDay(new Date(entry.created_at), date));
+    while (day <= calendarEnd) {
+      const dayEntry = moodEntries.find((entry) => isSameDay(new Date(entry.created_at), day));
 
-        week.push({
-          date,
-          mood: dayEntry?.mood_score || null,
-          hasEntry: !!dayEntry,
-          isToday: isSameDay(date, today),
-          isFuture: date > today,
-        });
-      }
+      days.push({
+        date: new Date(day),
+        mood: dayEntry?.mood_score || null,
+        hasEntry: !!dayEntry,
+        isToday: isSameDay(day, today),
+        isFuture: day > today,
+        isCurrentMonth: isSameMonth(day, currentDate),
+      });
 
-      weeks.push(week);
+      day = addDays(day, 1);
+    }
+
+    // Group days into weeks (exactly 5 weeks)
+    const weeks = [];
+    for (let i = 0; i < 35; i += 7) {
+      weeks.push(days.slice(i, i + 7));
     }
 
     return weeks;
-  }, [moodEntries]);
+  }, [moodEntries, currentDate]);
 
-  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    setCurrentDate((prev) => (direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1)));
+  };
+
+  const currentMonthEntries = moodEntries.filter((entry) =>
+    isSameMonth(new Date(entry.created_at), currentDate)
+  );
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Mood Calendar</CardTitle>
-        <CardDescription>Your mood patterns over the last 12 weeks</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Mood Calendar</CardTitle>
+            <CardDescription>
+              Your mood patterns for {format(currentDate, 'MMMM yyyy')}
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigateMonth('prev')}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigateMonth('next')}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Month labels */}
-          <div className="flex justify-between text-xs text-muted-foreground">
-            {heatmapData.length > 0 && (
-              <>
-                <span>{months[heatmapData[0][0].date.getMonth()]}</span>
-                <span>
-                  {months[heatmapData[Math.floor(heatmapData.length / 2)][0].date.getMonth()]}
-                </span>
-                <span>{months[heatmapData[heatmapData.length - 1][0].date.getMonth()]}</span>
-              </>
-            )}
+          {/* Day headers */}
+          <div className="grid grid-cols-7 gap-2">
+            {weekDays.map((day) => (
+              <div key={day} className="text-center text-sm font-medium text-muted-foreground p-2">
+                {day}
+              </div>
+            ))}
           </div>
 
-          {/* Heatmap grid */}
-          <div className="flex gap-1">
-            {/* Day labels */}
-            <div className="flex flex-col gap-1 mr-2">
-              <div className="h-3"></div> {/* Spacer for alignment */}
-              {weekDays.map((day, index) => (
-                <div key={day} className="h-3 text-xs text-muted-foreground flex items-center">
-                  {index % 2 === 0 ? day : ''}
-                </div>
-              ))}
-            </div>
-
-            {/* Heatmap cells */}
-            <div className="flex gap-1">
-              {heatmapData.map((week, weekIndex) => (
-                <div key={weekIndex} className="flex flex-col gap-1">
-                  {week.map((day, dayIndex) => (
-                    <TooltipProvider key={`${weekIndex}-${dayIndex}`}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
+          {/* Calendar grid */}
+          <div className="space-y-2">
+            {calendarData.map((week, weekIndex) => (
+              <div key={weekIndex} className="grid grid-cols-7 gap-2">
+                {week.map((day, dayIndex) => (
+                  <TooltipProvider key={`${weekIndex}-${dayIndex}`}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div
+                          className={`
+                            aspect-square rounded-lg border-2 cursor-pointer
+                            transition-all duration-200 hover:scale-105 hover:shadow-md
+                            flex flex-col items-center justify-center p-1 min-h-[60px]
+                            ${getMoodColor(day.mood)}
+                            ${day.isToday ? 'ring-2 ring-primary ring-offset-2' : 'border-border'}
+                            ${day.isFuture ? 'opacity-40' : ''}
+                            ${!day.hasEntry && !day.isFuture ? 'opacity-60' : ''}
+                            ${!day.isCurrentMonth ? 'opacity-30' : ''}
+                          `}
+                        >
+                          {/* Date number */}
                           <div
                             className={`
-                              w-3 h-3 rounded-sm border border-gray-200 dark:border-gray-700 cursor-pointer
-                              transition-all duration-200 hover:scale-110
-                              ${getMoodColor(day.mood)}
-                              ${day.isToday ? 'ring-2 ring-blue-500' : ''}
-                              ${day.isFuture ? 'opacity-30' : ''}
-                              ${!day.hasEntry && !day.isFuture ? 'opacity-50' : ''}
+                              text-xs font-medium mb-1
+                              ${day.isToday ? 'text-primary font-bold' : 'text-foreground'}
+                              ${!day.isCurrentMonth ? 'text-muted-foreground' : ''}
                             `}
                           >
-                            {day.hasEntry && (
-                              <div className="w-full h-full flex items-center justify-center text-[6px]">
-                                {getMoodEmoji(day.mood)}
-                              </div>
-                            )}
+                            {format(day.date, 'd')}
                           </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <div className="text-center">
-                            <p className="font-medium">{format(day.date, 'MMM dd, yyyy')}</p>
-                            {day.hasEntry ? (
-                              <div className="flex items-center gap-1 mt-1">
-                                <span>{getMoodEmoji(day.mood)}</span>
-                                <span>Mood: {day.mood}/10</span>
-                              </div>
-                            ) : day.isFuture ? (
-                              <p className="text-xs text-muted-foreground">Future date</p>
-                            ) : (
-                              <p className="text-xs text-muted-foreground">No mood recorded</p>
-                            )}
-                          </div>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  ))}
-                </div>
-              ))}
-            </div>
+
+                          {/* Mood emoji */}
+                          {day.hasEntry && (
+                            <div className="text-lg leading-none">{getMoodEmoji(day.mood)}</div>
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <div className="text-center">
+                          <p className="font-medium">{format(day.date, 'EEEE, MMM dd, yyyy')}</p>
+                          {day.hasEntry ? (
+                            <div className="flex items-center gap-1 mt-1">
+                              <span className="text-lg">{getMoodEmoji(day.mood)}</span>
+                              <span>Mood: {day.mood}/10</span>
+                            </div>
+                          ) : day.isFuture ? (
+                            <p className="text-xs text-muted-foreground">Future date</p>
+                          ) : (
+                            <p className="text-xs text-muted-foreground">No mood recorded</p>
+                          )}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ))}
+              </div>
+            ))}
           </div>
 
-          {/* Legend */}
+          {/* Legend and Stats */}
           <div className="flex items-center justify-between pt-4 border-t">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>Less</span>
-              <div className="flex gap-1">
-                <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-800 border"></div>
-                <div className="w-3 h-3 rounded-sm bg-red-200 dark:bg-red-900/50 border"></div>
-                <div className="w-3 h-3 rounded-sm bg-yellow-200 dark:bg-yellow-900/50 border"></div>
-                <div className="w-3 h-3 rounded-sm bg-blue-200 dark:bg-blue-900/50 border"></div>
-                <div className="w-3 h-3 rounded-sm bg-green-200 dark:bg-green-900/50 border"></div>
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <span>Mood Scale:</span>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 rounded-sm bg-gray-100 dark:bg-gray-800 border"></div>
+                <span>None</span>
               </div>
-              <span>More</span>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 rounded-sm bg-red-200 dark:bg-red-900/50 border"></div>
+                <span>Low (1-3)</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 rounded-sm bg-yellow-200 dark:bg-yellow-900/50 border"></div>
+                <span>Mid (4-5)</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 rounded-sm bg-blue-200 dark:bg-blue-900/50 border"></div>
+                <span>Good (6-7)</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 rounded-sm bg-green-200 dark:bg-green-900/50 border"></div>
+                <span>High (8-10)</span>
+              </div>
             </div>
 
-            <div className="text-xs text-muted-foreground">{moodEntries.length} total entries</div>
+            <div className="text-xs text-muted-foreground">
+              {currentMonthEntries.length} entries this month
+            </div>
           </div>
         </div>
       </CardContent>

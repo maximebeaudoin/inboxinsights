@@ -22,6 +22,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import { moodAnalytics } from '@/lib/services/mood-analytics';
 import type { MoodEntry, ViewMode } from '@/lib/types/mood-entry';
 
 import { useMoodEntries } from '@/hooks/use-mood-entries';
@@ -80,259 +81,15 @@ const getMoodEmoji = (score: number): string => {
   return moodEmojis[score as keyof typeof moodEmojis] || '😐';
 };
 
-// Enhanced analytics calculation function
-const calculateEnhancedAnalytics = (moodEntries: MoodEntry[]): EnhancedAnalytics => {
-  if (moodEntries.length === 0) {
-    return {
-      currentStreak: 0,
-      goalProgress: 0,
-      goalTrend: 'neutral',
-      avgEnergy: 0,
-      energyTrend: 'stable',
-      wellnessScore: 0,
-      wellnessLevel: 'poor',
-      weeklyTrend: 'stable',
-    };
-  }
-
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const twoWeeksAgo = new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
-
-  // Calculate current streak
-  const sortedEntries = [...moodEntries].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
-
-  let currentStreak = 0;
-  let checkDate = new Date(today);
-
-  for (let i = 0; i < 30; i++) {
-    // Check last 30 days
-    const hasEntry = sortedEntries.some((entry) => {
-      const entryDate = new Date(entry.created_at);
-      return entryDate.toDateString() === checkDate.toDateString();
-    });
-
-    if (hasEntry) {
-      currentStreak++;
-      checkDate.setDate(checkDate.getDate() - 1);
-    } else {
-      break;
-    }
-  }
-
-  // Today's mood
-  const todayEntries = moodEntries.filter((entry) => {
-    const entryDate = new Date(entry.created_at);
-    return entryDate.toDateString() === today.toDateString();
-  });
-  const todayMood = todayEntries.length > 0 ? todayEntries[0].mood_score : undefined;
-
-  // Weekly analysis
-  const thisWeekEntries = moodEntries.filter((entry) => new Date(entry.created_at) >= oneWeekAgo);
-  const lastWeekEntries = moodEntries.filter(
-    (entry) => new Date(entry.created_at) >= twoWeeksAgo && new Date(entry.created_at) < oneWeekAgo
-  );
-
-  const thisWeekAvg =
-    thisWeekEntries.length > 0
-      ? thisWeekEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / thisWeekEntries.length
-      : 0;
-  const lastWeekAvg =
-    lastWeekEntries.length > 0
-      ? lastWeekEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / lastWeekEntries.length
-      : 0;
-
-  const weeklyTrend =
-    thisWeekAvg > lastWeekAvg + 0.5 ? 'up' : thisWeekAvg < lastWeekAvg - 0.5 ? 'down' : 'stable';
-
-  // Best day this week
-  const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  let bestDayScore = 0;
-  let bestDay = '';
-
-  thisWeekEntries.forEach((entry) => {
-    if (entry.mood_score > bestDayScore) {
-      bestDayScore = entry.mood_score;
-      bestDay = weekDays[new Date(entry.created_at).getDay()];
-    }
-  });
-
-  // Energy analysis
-  const energyEntries = moodEntries.filter((entry) => entry.energy_level);
-  const avgEnergy =
-    energyEntries.length > 0
-      ? Math.round(
-          (energyEntries.reduce((sum, entry) => sum + (entry.energy_level || 0), 0) /
-            energyEntries.length) *
-            10
-        ) / 10
-      : 0;
-
-  const recentEnergyEntries = energyEntries.slice(0, 5);
-  const olderEnergyEntries = energyEntries.slice(5, 10);
-  const recentEnergyAvg =
-    recentEnergyEntries.length > 0
-      ? recentEnergyEntries.reduce((sum, entry) => sum + (entry.energy_level || 0), 0) /
-        recentEnergyEntries.length
-      : 0;
-  const olderEnergyAvg =
-    olderEnergyEntries.length > 0
-      ? olderEnergyEntries.reduce((sum, entry) => sum + (entry.energy_level || 0), 0) /
-        olderEnergyEntries.length
-      : 0;
-
-  const energyTrend =
-    recentEnergyAvg > olderEnergyAvg + 0.5
-      ? 'up'
-      : recentEnergyAvg < olderEnergyAvg - 0.5
-        ? 'down'
-        : 'stable';
-
-  // Wellness score calculation
-  const avgMood =
-    moodEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / moodEntries.length;
-  const stressEntries = moodEntries.filter((entry) => entry.stress_level);
-  const avgStress =
-    stressEntries.length > 0
-      ? stressEntries.reduce((sum, entry) => sum + (entry.stress_level || 0), 0) /
-        stressEntries.length
-      : 5;
-
-  const wellnessScore =
-    Math.round((avgMood * 0.4 + avgEnergy * 0.3 + (10 - avgStress) * 0.3) * 10) / 10;
-  const wellnessLevel =
-    wellnessScore >= 8
-      ? 'excellent'
-      : wellnessScore >= 6.5
-        ? 'good'
-        : wellnessScore >= 5
-          ? 'fair'
-          : 'poor';
-
-  // Goal progress (assuming goal is to maintain mood above 7)
-  const goodMoodEntries = moodEntries.filter((entry) => entry.mood_score >= 7);
-  const goalProgress = Math.round((goodMoodEntries.length / moodEntries.length) * 100);
-  const goalTrend = thisWeekAvg >= 7 ? 'up' : 'down';
-
-  // Time of day analysis
-  const morningEntries = moodEntries.filter((entry) => {
-    const hour = new Date(entry.created_at).getHours();
-    return hour >= 6 && hour < 12;
-  });
-  const afternoonEntries = moodEntries.filter((entry) => {
-    const hour = new Date(entry.created_at).getHours();
-    return hour >= 12 && hour < 18;
-  });
-  const eveningEntries = moodEntries.filter((entry) => {
-    const hour = new Date(entry.created_at).getHours();
-    return hour >= 18 || hour < 6;
-  });
-
-  const morningAvg =
-    morningEntries.length > 0
-      ? Math.round(
-          (morningEntries.reduce((sum, entry) => sum + entry.mood_score, 0) /
-            morningEntries.length) *
-            10
-        ) / 10
-      : undefined;
-  const afternoonAvg =
-    afternoonEntries.length > 0
-      ? Math.round(
-          (afternoonEntries.reduce((sum, entry) => sum + entry.mood_score, 0) /
-            afternoonEntries.length) *
-            10
-        ) / 10
-      : undefined;
-  const eveningAvg =
-    eveningEntries.length > 0
-      ? Math.round(
-          (eveningEntries.reduce((sum, entry) => sum + entry.mood_score, 0) /
-            eveningEntries.length) *
-            10
-        ) / 10
-      : undefined;
-
-  const timeAverages = [
-    { time: 'morning', avg: morningAvg || 0 },
-    { time: 'afternoon', avg: afternoonAvg || 0 },
-    { time: 'evening', avg: eveningAvg || 0 },
-  ];
-  const bestTimeOfDay = timeAverages.reduce((best, current) =>
-    current.avg > best.avg ? current : best
-  ).time;
-
-  // Sleep impact analysis
-  const sleepEntries = moodEntries.filter((entry) => entry.sleep_hours);
-  let sleepImpact: 'positive' | 'negative' | 'neutral' | undefined;
-  if (sleepEntries.length >= 3) {
-    const goodSleepEntries = sleepEntries.filter((entry) => (entry.sleep_hours || 0) >= 7);
-    const goodSleepMoodAvg =
-      goodSleepEntries.length > 0
-        ? goodSleepEntries.reduce((sum, entry) => sum + entry.mood_score, 0) /
-          goodSleepEntries.length
-        : 0;
-    const poorSleepEntries = sleepEntries.filter((entry) => (entry.sleep_hours || 0) < 7);
-    const poorSleepMoodAvg =
-      poorSleepEntries.length > 0
-        ? poorSleepEntries.reduce((sum, entry) => sum + entry.mood_score, 0) /
-          poorSleepEntries.length
-        : 0;
-
-    sleepImpact =
-      goodSleepMoodAvg > poorSleepMoodAvg + 0.5
-        ? 'positive'
-        : goodSleepMoodAvg < poorSleepMoodAvg - 0.5
-          ? 'negative'
-          : 'neutral';
-  }
-
-  // Generate recommendation
-  let topRecommendation = '';
-  if (avgMood < 5) {
-    topRecommendation = 'Consider reaching out to friends or engaging in activities you enjoy';
-  } else if (avgEnergy < 5) {
-    topRecommendation = 'Focus on getting better sleep and regular exercise';
-  } else if (avgStress > 7) {
-    topRecommendation = 'Try stress-reduction techniques like meditation or deep breathing';
-  } else {
-    topRecommendation = 'Keep up the great work! Your mood patterns look healthy';
-  }
-
-  return {
-    currentStreak,
-    goalProgress,
-    goalTrend,
-    avgEnergy,
-    energyTrend,
-    wellnessScore,
-    wellnessLevel,
-    todayMood,
-    bestDayScore: bestDayScore > 0 ? bestDayScore : undefined,
-    bestDay: bestDay || undefined,
-    weeklyAverage: thisWeekAvg > 0 ? Math.round(thisWeekAvg * 10) / 10 : undefined,
-    weeklyTrend,
-    morningAvg,
-    afternoonAvg,
-    eveningAvg,
-    bestTimeOfDay: morningAvg || afternoonAvg || eveningAvg ? bestTimeOfDay : undefined,
-    sleepImpact,
-    stressCorrelation: avgStress > 7 ? 'high' : avgStress > 4 ? 'medium' : 'low',
-    energySync: Math.abs(avgMood - avgEnergy) < 1 ? 'aligned' : 'misaligned',
-    topRecommendation,
-  };
-};
+// Note: Enhanced analytics calculation moved to centralized mood-analytics service
 
 export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
   const { moodEntries, loading, loadingMore, error, hasMore, totalCount, refetch, loadMore } =
     useMoodEntries(initialMoodEntries, viewMode);
 
-  // Enhanced analytics calculations
-  const analytics = calculateEnhancedAnalytics(moodEntries);
+  // Enhanced analytics calculations using centralized service
+  const analytics = moodAnalytics.calculateEnhancedAnalytics(moodEntries);
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-8">
@@ -382,36 +139,74 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
         </div>
       </div>
 
-      {/* Hero Metrics Section */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50"></div>
-          <CardContent className="relative p-6">
+      {/* Compact Hero Metrics Section */}
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-l-blue-500">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 to-blue-100/80 dark:from-blue-950/30 dark:to-blue-900/30 group-hover:from-blue-100/90 group-hover:to-blue-200/90 dark:group-hover:from-blue-950/50 dark:group-hover:to-blue-900/50 transition-all duration-300"></div>
+          <CardContent className="relative p-4">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Current Streak</p>
-                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-xs font-semibold text-muted-foreground">Current Streak</p>
+                  {analytics.currentStreak >= 7 && (
+                    <Badge variant="secondary" className="text-xs px-1.5 py-0.5 h-4">
+                      🔥 Hot
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform duration-200">
                   {analytics.currentStreak}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {analytics.currentStreak === 1 ? 'day' : 'days'} in a row
+                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                  <span>{analytics.currentStreak === 1 ? 'day' : 'days'} in a row</span>
+                  {analytics.currentStreak > 0 && (
+                    <span className="text-blue-600 dark:text-blue-400">
+                      {analytics.currentStreak >= 30
+                        ? '🏆'
+                        : analytics.currentStreak >= 14
+                          ? '🥇'
+                          : analytics.currentStreak >= 7
+                            ? '🥈'
+                            : '🥉'}
+                    </span>
+                  )}
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
                 <Award className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
+
+            {/* Progress indicator */}
+            <div className="mt-2 w-full bg-blue-100 dark:bg-blue-900/30 rounded-full h-1">
+              <div
+                className="bg-blue-500 h-1 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min((analytics.currentStreak / 30) * 100, 100)}%` }}
+              ></div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 text-center">
+              {analytics.currentStreak < 30
+                ? `${30 - analytics.currentStreak} days to milestone`
+                : 'Milestone achieved! 🎉'}
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/50"></div>
-          <CardContent className="relative p-6">
+        <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-l-green-500">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-50/80 to-green-100/80 dark:from-green-950/30 dark:to-green-900/30 group-hover:from-green-100/90 group-hover:to-green-200/90 dark:group-hover:from-green-950/50 dark:group-hover:to-green-900/50 transition-all duration-300"></div>
+          <CardContent className="relative p-4">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Mood Goal</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-xs font-semibold text-muted-foreground">Mood Goal</p>
+                  {analytics.goalProgress >= 80 && (
+                    <Badge variant="secondary" className="text-xs px-1.5 py-0.5 h-4">
+                      🎯 Excellent
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400 group-hover:scale-105 transition-transform duration-200">
                     {Math.round(analytics.goalProgress)}%
                   </p>
                   {analytics.goalTrend === 'up' ? (
@@ -420,49 +215,103 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
                     <TrendingDown className="h-4 w-4 text-red-500" />
                   )}
                 </div>
-                <Progress value={analytics.goalProgress} className="mt-2" />
+                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                  <span>{analytics.goalTrend === 'up' ? 'On track' : 'Needs attention'}</span>
+                  {analytics.goalProgress >= 90 && <span>🌟</span>}
+                </p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
                 <Target className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
             </div>
+
+            {/* Enhanced progress indicator */}
+            <div className="mt-2 relative w-full h-1 bg-green-100 dark:bg-green-900/30 rounded-full overflow-hidden">
+              <div
+                className="absolute left-0 top-0 h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all duration-700 ease-out"
+                style={{ width: `${analytics.goalProgress}%` }}
+              ></div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 text-center">
+              {analytics.goalProgress >= 100
+                ? 'Goal achieved! 🎉'
+                : `${100 - analytics.goalProgress}% to goal`}
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50"></div>
-          <CardContent className="relative p-6">
+        <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-l-purple-500">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-50/80 to-purple-100/80 dark:from-purple-950/30 dark:to-purple-900/30 group-hover:from-purple-100/90 group-hover:to-purple-200/90 dark:group-hover:from-purple-950/50 dark:group-hover:to-purple-900/50 transition-all duration-300"></div>
+          <CardContent className="relative p-4">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Energy Level</p>
-                <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-xs font-semibold text-muted-foreground">Energy Level</p>
+                  {analytics.avgEnergy >= 8 && (
+                    <Badge variant="secondary" className="text-xs px-1.5 py-0.5 h-4">
+                      ⚡ High
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform duration-200">
                   {analytics.avgEnergy > 0 ? `${analytics.avgEnergy}/10` : 'N/A'}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {analytics.energyTrend === 'up'
-                    ? '↗ Increasing'
-                    : analytics.energyTrend === 'down'
-                      ? '↘ Decreasing'
-                      : '→ Stable'}
+                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                  <span>
+                    {analytics.energyTrend === 'up'
+                      ? '↗ Increasing'
+                      : analytics.energyTrend === 'down'
+                        ? '↘ Decreasing'
+                        : '→ Stable'}
+                  </span>
+                  {analytics.avgEnergy >= 9 && <span>🔋</span>}
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
                 <Zap className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
+
+            {/* Energy level indicator */}
+            {analytics.avgEnergy > 0 && (
+              <div className="mt-2">
+                <div className="w-full h-1 bg-purple-100 dark:bg-purple-900/30 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all duration-700 ease-out"
+                    style={{ width: `${(analytics.avgEnergy / 10) * 100}%` }}
+                  ></div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 text-center">
+                  {analytics.avgEnergy >= 8
+                    ? 'High energy! 🚀'
+                    : analytics.avgEnergy >= 6
+                      ? 'Good energy ⚡'
+                      : analytics.avgEnergy >= 4
+                        ? 'Moderate energy'
+                        : 'Low energy 🔋'}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/50 dark:to-orange-900/50"></div>
-          <CardContent className="relative p-6">
+        <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-l-orange-500">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-orange-100/80 dark:from-orange-950/30 dark:to-orange-900/30 group-hover:from-orange-100/90 group-hover:to-orange-200/90 dark:group-hover:from-orange-950/50 dark:group-hover:to-orange-900/50 transition-all duration-300"></div>
+          <CardContent className="relative p-4">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Wellness Score</p>
-                <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-xs font-semibold text-muted-foreground">Wellness Score</p>
+                  {analytics.wellnessLevel === 'excellent' && (
+                    <Badge variant="secondary" className="text-xs px-1.5 py-0.5 h-4">
+                      🌟 Excellent
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 group-hover:scale-105 transition-transform duration-200">
                   {analytics.wellnessScore}
                 </p>
-                <div className="flex items-center gap-1 mt-1">
+                <div className="flex items-center gap-2 mt-0.5">
                   <Badge
                     variant={
                       analytics.wellnessLevel === 'excellent'
@@ -471,15 +320,37 @@ export function MoodMeterDashboard({ initialMoodEntries }: MoodMeterDashboardPro
                           ? 'secondary'
                           : 'outline'
                     }
-                    className="text-xs"
+                    className="text-xs capitalize h-4"
                   >
                     {analytics.wellnessLevel}
                   </Badge>
+                  {analytics.wellnessLevel === 'excellent' && (
+                    <span className="text-orange-600">🏆</span>
+                  )}
                 </div>
               </div>
-              <div className="h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900/50 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900/50 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
                 <Brain className="h-6 w-6 text-orange-600 dark:text-orange-400" />
               </div>
+            </div>
+
+            {/* Wellness score indicator */}
+            <div className="mt-2">
+              <div className="w-full h-1 bg-orange-100 dark:bg-orange-900/30 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${(analytics.wellnessScore / 10) * 100}%` }}
+                ></div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1 text-center">
+                {analytics.wellnessLevel === 'excellent'
+                  ? 'Outstanding wellness! 🌟'
+                  : analytics.wellnessLevel === 'good'
+                    ? 'Great wellness 👍'
+                    : analytics.wellnessLevel === 'fair'
+                      ? 'Fair wellness'
+                      : 'Focus on wellness 💪'}
+              </p>
             </div>
           </CardContent>
         </Card>

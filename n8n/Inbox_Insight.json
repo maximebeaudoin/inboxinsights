@@ -9,10 +9,7 @@
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [
-        0,
-        -240
-      ],
+      "position": [0, -240],
       "id": "195f6da3-4844-48e6-b3a0-2050b7098312",
       "name": "Webhook",
       "webhookId": "f12fc46a-945f-48c0-84d0-8884ea0eecf6"
@@ -38,10 +35,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
-      "position": [
-        660,
-        60
-      ],
+      "position": [660, 60],
       "id": "9426a325-3c28-450a-b218-e7a8f475586e",
       "name": "Aura Agent",
       "credentials": {
@@ -59,10 +53,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
-      "position": [
-        220,
-        -240
-      ],
+      "position": [220, -240],
       "id": "6cf1568a-6bf6-46e2-93f1-a008e6b5232b",
       "name": "Classify Text For Violations",
       "notesInFlow": false,
@@ -150,10 +141,7 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [
-        440,
-        -240
-      ],
+      "position": [440, -240],
       "id": "63cb9f45-9cc0-4788-b715-c5b5dfce2225",
       "name": "If"
     },
@@ -171,10 +159,7 @@
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [
-        738,
-        -340
-      ],
+      "position": [738, -340],
       "id": "c48b0658-b2e4-40e3-9103-517b52467820",
       "name": "Send Alerts",
       "webhookId": "7e3b36ca-afcf-4be6-8f3a-4c815f790157",
@@ -230,9 +215,7 @@
             "email_entry_id": "={{ $('Webhook').item.json.body.MessageID }}",
             "flagged": "={{ $('Classify Text For Violations').item.json.flagged }}"
           },
-          "matchingColumns": [
-            "email_entry_id"
-          ],
+          "matchingColumns": ["email_entry_id"],
           "schema": [
             {
               "id": "id",
@@ -480,10 +463,7 @@
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
-      "position": [
-        1040,
-        -40
-      ],
+      "position": [1040, -40],
       "id": "4e90a0c2-70c8-4f94-ad62-a937ba3f673e",
       "name": "Insert violations data",
       "credentials": {
@@ -523,9 +503,7 @@
             "from_name": "={{ $('Webhook').item.json.body.FromName }}",
             "subject": "={{ $('Webhook').item.json.body.Subject }}"
           },
-          "matchingColumns": [
-            "email_entry_id"
-          ],
+          "matchingColumns": ["email_entry_id"],
           "schema": [
             {
               "id": "id",
@@ -671,10 +649,7 @@
       },
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
-      "position": [
-        1040,
-        160
-      ],
+      "position": [1040, 160],
       "id": "f96b22b1-6267-44fc-8ea3-b0faad22c7be",
       "name": "Insert Mood",
       "credentials": {
@@ -692,10 +667,7 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [
-        160,
-        -420
-      ],
+      "position": [160, -420],
       "id": "5775bfd0-b413-4f21-8ccd-43dddd4e75a8",
       "name": "Sticky Note"
     },
@@ -707,10 +679,7 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [
-        640,
-        -100
-      ],
+      "position": [640, -100],
       "id": "4d088d6e-638b-4879-967c-879032c25f8a",
       "name": "Sticky Note1"
     }
@@ -774,9 +743,7 @@
       ]
     },
     "Send Alerts": {
-      "main": [
-        []
-      ]
+      "main": [[]]
     }
   },
   "active": true,
