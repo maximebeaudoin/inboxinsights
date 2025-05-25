@@ -1,5 +1,7 @@
 import { PAGINATION_CONFIG } from '@/lib/config/pagination';
 
+import type { EmailViolation } from './email-violations';
+
 // Centralized type definitions for mood entries
 export interface MoodEntry {
   id: string;
@@ -16,6 +18,8 @@ export interface MoodEntry {
   from_name?: string;
   subject?: string;
   created_at: string;
+  // Optional relation to email violation data
+  email_violation?: EmailViolation | null;
 }
 
 export type ViewMode = 'personal' | 'global';

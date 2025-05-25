@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { APP_CONFIG } from '@/lib/config';
 import { PAGINATION_CONFIG } from '@/lib/config/pagination';
 import { getCurrentUser } from '@/lib/supabase/auth';
+import type { EmailViolation } from '@/lib/types/email-violations';
 import type {
   MoodEntriesQuery,
   MoodEntry,
@@ -77,12 +78,59 @@ export class MoodEntriesService {
     const hasMore = entries.length === limit && offset + limit < total;
     const nextOffset = hasMore ? offset + limit : undefined;
 
+    // Fetch email violations for entries that have email_entry_id
+    const entriesWithViolations = await this.attachEmailViolations(entries);
+
     return {
-      data: entries,
+      data: entriesWithViolations,
       hasMore,
       total,
       nextOffset,
     };
+  }
+
+  /**
+   * Attach email violation data to mood entries
+   */
+  private async attachEmailViolations(entries: MoodEntry[]): Promise<MoodEntry[]> {
+    // Get email_entry_ids from entries that have them
+    const emailEntryIds = entries
+      .filter((entry) => entry.email_entry_id)
+      .map((entry) => entry.email_entry_id!);
+
+    if (emailEntryIds.length === 0) {
+      return entries;
+    }
+
+    try {
+      // Fetch violations for these email_entry_ids
+      const { data: violations, error } = await this.supabase
+        .from('email_violations')
+        .select('*')
+        .in('email_entry_id', emailEntryIds);
+
+      if (error) {
+        console.error('Error fetching email violations:', error);
+        // Return entries without violations rather than failing
+        return entries;
+      }
+
+      // Create a map of violations by email_entry_id
+      const violationsMap: Record<string, EmailViolation> = {};
+      violations?.forEach((violation) => {
+        violationsMap[violation.email_entry_id] = violation;
+      });
+
+      // Attach violations to entries
+      return entries.map((entry) => ({
+        ...entry,
+        email_violation: entry.email_entry_id ? violationsMap[entry.email_entry_id] || null : null,
+      }));
+    } catch (error) {
+      console.error('Error in attachEmailViolations:', error);
+      // Return entries without violations rather than failing
+      return entries;
+    }
   }
 
   /**
