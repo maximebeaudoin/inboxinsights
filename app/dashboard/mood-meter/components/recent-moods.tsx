@@ -84,10 +84,13 @@ const moodLabels = {
 };
 
 const getMoodColor = (score: number) => {
-  if (score <= 3) return 'bg-red-100 text-red-800 border-red-200';
-  if (score <= 5) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-  if (score <= 7) return 'bg-blue-100 text-blue-800 border-blue-200';
-  return 'bg-green-100 text-green-800 border-green-200';
+  if (score <= 3)
+    return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800';
+  if (score <= 5)
+    return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800';
+  if (score <= 7)
+    return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800';
+  return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-800';
 };
 
 export function RecentMoods({
@@ -438,25 +441,25 @@ export function RecentMoods({
 
                     {/* Additional metrics - responsive sizing */}
                     {entry.energy_level && (
-                      <span className="bg-blue-50 text-blue-700 border border-blue-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
+                      <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
                         <span className="sm:hidden">⚡{entry.energy_level}</span>
                         <span className="hidden sm:inline">⚡ Energy: {entry.energy_level}/10</span>
                       </span>
                     )}
                     {entry.stress_level && (
-                      <span className="bg-orange-50 text-orange-700 border border-orange-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
+                      <span className="bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
                         <span className="sm:hidden">😰{entry.stress_level}</span>
                         <span className="hidden sm:inline">😰 Stress: {entry.stress_level}/10</span>
                       </span>
                     )}
                     {entry.sleep_hours && (
-                      <span className="bg-purple-50 text-purple-700 border border-purple-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
+                      <span className="bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
                         <span className="sm:hidden">😴{entry.sleep_hours}h</span>
                         <span className="hidden sm:inline">😴 Sleep: {entry.sleep_hours}h</span>
                       </span>
                     )}
                     {entry.weather && (
-                      <span className="bg-cyan-50 text-cyan-700 border border-cyan-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
+                      <span className="bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-medium">
                         <span className="sm:hidden">🌤️</span>
                         <span className="hidden sm:inline">🌤️ {entry.weather}</span>
                       </span>
