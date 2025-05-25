@@ -55,7 +55,7 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent className="w-[600px] sm:w-[700px] sm:max-w-[700px] overflow-y-auto">
+      <SheetContent className="w-full sm:w-[550px] sm:max-w-[550px] overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-blue-500" />
