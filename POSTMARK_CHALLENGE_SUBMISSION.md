@@ -42,12 +42,9 @@ Mental health and emotional well-being tracking is often cumbersome, requiring u
 
 ## 🧪 Demo
 
-### Live Application
-
-- **Dashboard**: [https://www.inboxinsights.me/](https://inboxinsights.vercel.app)
-- **Demo Credentials**:
-  - Email: `demo@inboxinsights.me`
-  - Password: `asBuhn7YHzekK46!`
+> **🚀 Try InboxInsights Live: [https://inboxinsights.me/](https://inboxinsights.me/)**
+>
+> I strongly encourage you to test the full application! We've built extensive features and content that showcase the complete email-to-analytics workflow. The live demo includes rich mood data, advanced visualizations, and AI-powered insights.
 
 ### Testing Instructions
 
