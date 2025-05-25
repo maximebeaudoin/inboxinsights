@@ -198,14 +198,14 @@ Demo User`);
             <Alert
               className={
                 postmarkStatus.configured
-                  ? 'border-green-200 bg-green-50'
-                  : 'border-yellow-200 bg-yellow-50'
+                  ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/50'
+                  : 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/50'
               }
             >
               {postmarkStatus.configured ? (
-                <CheckCircle className="h-4 w-4 text-green-600" />
+                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
               ) : (
-                <AlertCircle className="h-4 w-4 text-yellow-600" />
+                <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
               )}
               <AlertDescription>
                 <span className="font-medium">{postmarkStatus.message}</span>

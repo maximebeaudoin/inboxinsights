@@ -360,7 +360,7 @@ export function MoodStats({ moodEntries }: MoodStatsProps) {
                   </div>
                   <Badge
                     variant={
-                      Math.abs(insights.correlations.sleepMood) > 0.3 ? 'default' : 'outline'
+                      Math.abs(insights.correlations.sleepMood) > 0.3 ? 'secondary' : 'outline'
                     }
                     className="text-xs h-5"
                   >
@@ -381,7 +381,7 @@ export function MoodStats({ moodEntries }: MoodStatsProps) {
                   </div>
                   <Badge
                     variant={
-                      Math.abs(insights.correlations.energyMood) > 0.3 ? 'default' : 'outline'
+                      Math.abs(insights.correlations.energyMood) > 0.3 ? 'secondary' : 'outline'
                     }
                     className="text-xs h-5"
                   >
@@ -402,7 +402,7 @@ export function MoodStats({ moodEntries }: MoodStatsProps) {
                   </div>
                   <Badge
                     variant={
-                      Math.abs(insights.correlations.stressMood) > 0.3 ? 'default' : 'outline'
+                      Math.abs(insights.correlations.stressMood) > 0.3 ? 'secondary' : 'outline'
                     }
                     className="text-xs h-5"
                   >
@@ -429,7 +429,7 @@ export function MoodStats({ moodEntries }: MoodStatsProps) {
                   <span className="text-sm">🎯</span>
                   <span className="text-xs">Highest Mood</span>
                 </div>
-                <Badge variant="default" className="text-xs font-bold h-5">
+                <Badge variant="secondary" className="text-xs font-bold h-5">
                   {insights.personalBests.highestMood}/10
                 </Badge>
               </div>
