@@ -169,7 +169,7 @@ Demo User`);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5 text-blue-500" />
@@ -187,72 +187,63 @@ Demo User`);
           </DialogDescription>
         </DialogHeader>
 
-        {/* Postmark Status */}
-        {statusLoading ? (
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>Checking Postmark configuration...</AlertDescription>
-          </Alert>
-        ) : postmarkStatus ? (
-          <Alert
-            className={
-              postmarkStatus.configured
-                ? 'border-green-200 bg-green-50'
-                : 'border-yellow-200 bg-yellow-50'
-            }
-          >
-            {postmarkStatus.configured ? (
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            ) : (
-              <AlertCircle className="h-4 w-4 text-yellow-600" />
-            )}
-            <AlertDescription>
-              <div className="space-y-1">
-                <p className="font-medium">{postmarkStatus.message}</p>
-                <p className="text-xs text-muted-foreground">
-                  Mode:{' '}
-                  {postmarkStatus.details.mode === 'postmark'
-                    ? '📧 Real emails via Postmark'
-                    : '🔄 Simulation mode'}
-                  {postmarkStatus.details.fromEmail && (
-                    <span> • From: {postmarkStatus.details.fromEmail}</span>
-                  )}
-                </p>
-              </div>
-            </AlertDescription>
-          </Alert>
-        ) : null}
+        <div className="flex-1 overflow-y-auto">
+          {/* Postmark Status */}
+          {statusLoading ? (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>Checking Postmark configuration...</AlertDescription>
+            </Alert>
+          ) : postmarkStatus ? (
+            <Alert
+              className={
+                postmarkStatus.configured
+                  ? 'border-green-200 bg-green-50'
+                  : 'border-yellow-200 bg-yellow-50'
+              }
+            >
+              {postmarkStatus.configured ? (
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-yellow-600" />
+              )}
+              <AlertDescription>
+                <span className="font-medium">{postmarkStatus.message}</span>
+              </AlertDescription>
+            </Alert>
+          ) : null}
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="subject">Subject</Label>
-            <Input
-              id="subject"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Enter email subject..."
-              disabled={isLoading}
-            />
-          </div>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="subject">Subject</Label>
+              <Input
+                id="subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Enter email subject..."
+                disabled={isLoading}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="message">Message</Label>
-            <Textarea
-              id="message"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Enter your mood tracking message..."
-              className="min-h-[200px] font-mono text-sm"
-              disabled={isLoading}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="message">Message</Label>
+              <Textarea
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Enter your mood tracking message..."
+                className="min-h-[150px] font-mono text-sm"
+                disabled={isLoading}
+              />
+            </div>
 
-          <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
-            <p className="font-medium mb-1">💡 Tip:</p>
-            <p>
-              Include details about your mood (1-10), energy level, stress, sleep hours, and daily
-              activities for the best AI analysis results.
-            </p>
+            <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
+              <p className="font-medium mb-1">💡 Tip:</p>
+              <p>
+                Include details about your mood (1-10), energy level, stress, sleep hours, and daily
+                activities for the best AI analysis results.
+              </p>
+            </div>
           </div>
         </div>
 
