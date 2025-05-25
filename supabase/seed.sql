@@ -791,4 +791,219 @@ I GRADUATED SUMMA CUM LAUDE!!! Four years of hard work, late nights, and stress 
     'proud.graduate@university.edu',
     'Proud Graduate',
     NOW() - INTERVAL '90 days'
+),
+
+-- InboxInsights Demo User - demo@inboxinsights.me
+-- Recent entries for the official demo account
+(
+    gen_random_uuid(),
+    gen_random_uuid(),
+    8,
+    7,
+    3,
+    'Testing the InboxInsights platform! Really impressed with the mood tracking features.',
+    'Sunny and pleasant',
+    7.5,
+    'Platform testing, feature exploration, documentation review',
+    'Subject: InboxInsights Platform Testing
+
+Mood: 8/10 - Excited about this new tool
+Energy: 7/10 - Engaged and focused
+Stress: 3/10 - Low stress, just exploring
+
+Been testing the InboxInsights platform today and I''m really impressed! The mood tracking through email is such an innovative approach. The dashboard visualizations are clean and the data insights are helpful. Sunny weather made the testing session even more enjoyable. Got good sleep and feel energized to explore more features.',
+    'demo@inboxinsights.me',
+    'InboxInsights Demo',
+    NOW() - INTERVAL '6 hours'
+),
+(
+    gen_random_uuid(),
+    gen_random_uuid(),
+    7,
+    6,
+    4,
+    'Busy day at work but managed to send my mood update. Love how easy this system is!',
+    'Partly cloudy',
+    6.5,
+    'Work meetings, mood tracking, team collaboration',
+    'Subject: Quick mood check-in
+
+Mood: 7/10 - Good day overall
+Energy: 6/10 - Steady work energy
+Stress: 4/10 - Manageable workload
+
+Had a busy day with back-to-back meetings but still managed to send my mood update to InboxInsights. I love how simple it is - just send an email and the system captures everything automatically. The weather was partly cloudy but didn''t affect my mood much. Got decent sleep last night. This tool is going to be a game-changer for mood tracking!',
+    'demo@inboxinsights.me',
+    'InboxInsights Demo',
+    NOW() - INTERVAL '1 day'
+),
+(
+    gen_random_uuid(),
+    gen_random_uuid(),
+    9,
+    8,
+    2,
+    'Weekend relaxation mode! Perfect time to reflect on the week and plan ahead.',
+    'Beautiful clear skies',
+    8.0,
+    'Weekend relaxation, meal prep, nature walk',
+    'Subject: Weekend Reflection 🌟
+
+Mood: 9/10 - Feeling refreshed and optimistic
+Energy: 8/10 - Well-rested and motivated
+Stress: 2/10 - Completely relaxed
+
+What a perfect weekend for reflection! Spent time meal prepping for the week, took a long nature walk under beautiful clear skies, and used InboxInsights to review my mood patterns from the past week. It''s fascinating to see how my mood correlates with sleep and activities. Got 8 hours of sleep and feel completely recharged for Monday.',
+    'demo@inboxinsights.me',
+    'InboxInsights Demo',
+    NOW() - INTERVAL '2 days'
+),
+(
+    gen_random_uuid(),
+    gen_random_uuid(),
+    5,
+    4,
+    7,
+    'Challenging day with technical issues. Grateful for tools that help track my mental state.',
+    'Overcast and drizzly',
+    6.0,
+    'Troubleshooting, problem-solving, stress management',
+    'Subject: Technical Difficulties Day
+
+Mood: 5/10 - Frustrated but managing
+Energy: 4/10 - Drained from problem-solving
+Stress: 7/10 - Higher than usual due to tech issues
+
+Spent most of the day dealing with technical difficulties at work. Multiple systems went down and it was all hands on deck to resolve issues. The overcast and drizzly weather didn''t help the mood. Despite the stress, I''m grateful to have InboxInsights to track how these challenging days affect me. It helps me recognize patterns and manage my mental health better.',
+    'demo@inboxinsights.me',
+    'InboxInsights Demo',
+    NOW() - INTERVAL '4 days'
+),
+(
+    gen_random_uuid(),
+    gen_random_uuid(),
+    8,
+    7,
+    3,
+    'Great feedback from the team about InboxInsights! Everyone loves the simplicity.',
+    'Bright and energizing',
+    7.0,
+    'Team demo, feedback session, feature planning',
+    'Subject: Team Loves InboxInsights! 🎉
+
+Mood: 8/10 - Thrilled with positive feedback
+Energy: 7/10 - Energized by team enthusiasm
+Stress: 3/10 - Confident and excited
+
+Presented InboxInsights to the team today and the feedback was overwhelmingly positive! Everyone loves how simple it is to track mood through email - no apps to remember, no complex interfaces. The bright weather matched my mood perfectly. The team is already brainstorming ways to integrate this into our wellness initiatives. This is exactly the kind of validation that makes all the development work worthwhile!',
+    'demo@inboxinsights.me',
+    'InboxInsights Demo',
+    NOW() - INTERVAL '7 days'
+),
+(
+    gen_random_uuid(),
+    gen_random_uuid(),
+    6,
+    5,
+    5,
+    'Regular check-in to maintain consistent mood tracking habits.',
+    'Typical weather',
+    7.0,
+    'Routine work, habit building, consistency practice',
+    'Subject: Daily Habit Check-in
+
+Mood: 6/10 - Steady and consistent
+Energy: 5/10 - Normal energy levels
+Stress: 5/10 - Baseline stress
+
+Nothing particularly exciting today, but that''s exactly why I''m sending this update! Building consistent mood tracking habits is key to getting valuable insights from InboxInsights. Even on average days like this, the data helps establish baselines. Weather was typical, got my usual 7 hours of sleep. Consistency is the foundation of good mood tracking.',
+    'demo@inboxinsights.me',
+    'InboxInsights Demo',
+    NOW() - INTERVAL '10 days'
+),
+(
+    gen_random_uuid(),
+    gen_random_uuid(),
+    9,
+    9,
+    1,
+    'First week using InboxInsights complete! Amazing insights into my mood patterns.',
+    'Perfect spring day',
+    8.5,
+    'Data analysis, pattern recognition, insight discovery',
+    'Subject: One Week of InboxInsights - Mind Blown! 🤯
+
+Mood: 9/10 - Absolutely fascinated by the insights
+Energy: 9/10 - Energized by self-discovery
+Stress: 1/10 - Peaceful and enlightened
+
+Just completed my first full week of using InboxInsights and WOW! The patterns are so clear when you see them visualized. I had no idea how much weather affected my mood, or how my sleep quality correlated with my stress levels. This perfect spring day feels even better knowing I''m building valuable self-awareness. Got excellent sleep and feel like I''ve unlocked a new level of emotional intelligence!',
+    'demo@inboxinsights.me',
+    'InboxInsights Demo',
+    NOW() - INTERVAL '14 days'
+),
+
+-- Historical entries for demo@inboxinsights.me showing longer-term usage
+(
+    gen_random_uuid(),
+    gen_random_uuid(),
+    7,
+    6,
+    4,
+    'Monthly review of mood data. Interesting trends emerging over time.',
+    'Crisp autumn day',
+    7.5,
+    'Data review, trend analysis, goal setting',
+    'Subject: Monthly Mood Data Review 📊
+
+Mood: 7/10 - Satisfied with progress
+Energy: 6/10 - Focused analytical energy
+Stress: 4/10 - Manageable reflection stress
+
+Did my monthly review of InboxInsights data today. It''s incredible to see mood trends over 30 days! I can clearly identify my most productive days, stress triggers, and what activities boost my mood most. The crisp autumn weather was perfect for this kind of reflective work. Using these insights to set better goals for next month.',
+    'demo@inboxinsights.me',
+    'InboxInsights Demo',
+    NOW() - INTERVAL '25 days'
+),
+(
+    gen_random_uuid(),
+    gen_random_uuid(),
+    4,
+    3,
+    8,
+    'Stressful project deadline week. InboxInsights helping me track the impact.',
+    'Gray and pressured',
+    5.5,
+    'Deadline crunch, overtime work, stress monitoring',
+    'Subject: Deadline Stress Tracking
+
+Mood: 4/10 - Feeling the pressure
+Energy: 3/10 - Running low on reserves
+Stress: 8/10 - High deadline pressure
+
+In the middle of a brutal deadline week. Working long hours and feeling the stress, but I''m grateful to have InboxInsights tracking how this affects me. The gray weather isn''t helping, and I''m only getting 5.5 hours of sleep. This data will be valuable for planning better work-life balance in future projects.',
+    'demo@inboxinsights.me',
+    'InboxInsights Demo',
+    NOW() - INTERVAL '35 days'
+),
+(
+    gen_random_uuid(),
+    gen_random_uuid(),
+    8,
+    8,
+    2,
+    'Vacation planning complete! Looking forward to some time off to recharge.',
+    'Bright and hopeful',
+    8.0,
+    'Vacation planning, anticipation, preparation',
+    'Subject: Vacation Mode Activated! ✈️
+
+Mood: 8/10 - Excited for upcoming break
+Energy: 8/10 - Energized by anticipation
+Stress: 2/10 - Relaxed and prepared
+
+Finally finished planning my vacation! Booked flights, hotels, and activities. The bright weather matches my optimistic mood perfectly. Got great sleep last night and I''m already feeling the mental benefits of having something to look forward to. InboxInsights will be interesting to use during vacation - curious to see how travel affects my mood patterns!',
+    'demo@inboxinsights.me',
+    'InboxInsights Demo',
+    NOW() - INTERVAL '45 days'
 );
