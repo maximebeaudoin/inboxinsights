@@ -1,9 +1,22 @@
 'use client';
 
+import { useState } from 'react';
+
 import { format, formatDistanceToNow } from 'date-fns';
-import { FileText, Info } from 'lucide-react';
+import { FileText, Info, Trash2 } from 'lucide-react';
 
 import { DataIngestionInfo } from '@/components/data-ingestion-info';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +28,10 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+import { deleteMoodEntryAction } from '@/app/actions';
+
+import { useToast } from '@/hooks/use-toast';
 
 import type { MoodEntry } from '../page';
 
@@ -67,6 +84,39 @@ const getMoodColor = (score: number) => {
 };
 
 export function RecentMoods({ moodEntries }: RecentMoodsProps) {
+  const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleDeleteEntry = async (entryId: string) => {
+    setDeletingEntryId(entryId);
+
+    try {
+      const result = await deleteMoodEntryAction(entryId);
+
+      if (result.success) {
+        toast({
+          title: 'Success',
+          description: result.message,
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: result.error,
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting mood entry:', error);
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred while deleting the mood entry',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeletingEntryId(null);
+    }
+  };
+
   if (moodEntries.length === 0) {
     return (
       <div className="space-y-6">
@@ -101,7 +151,7 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
             <div className="flex-1 min-w-0 pb-6">
               <div className="bg-card rounded-lg border p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-border/80">
                 <div className="space-y-4">
-                  {/* Header with time and raw data button */}
+                  {/* Header with time and action buttons */}
                   <div className="flex items-center justify-between gap-2">
                     <TooltipProvider>
                       <Tooltip>
@@ -117,140 +167,182 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
-                    {/* Raw Data Sheet */}
-                    <Sheet>
-                      <SheetTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-auto p-0 text-muted-foreground hover:text-foreground text-xs p-2"
-                        >
-                          Show Raw Data
-                          <FileText className="h-3 w-3" />
-                        </Button>
-                      </SheetTrigger>
-                      <SheetContent className="w-[500px] sm:w-[700px] sm:max-w-[700px] overflow-y-auto">
-                        <SheetHeader>
-                          <SheetTitle>Raw Entry Data</SheetTitle>
-                          <SheetDescription>
-                            Original text and raw data for this mood entry
-                          </SheetDescription>
-                        </SheetHeader>
-                        <div className="mt-6 space-y-4">
-                          {/* Original Text */}
-                          {entry.original_text && (
+
+                    <div className="flex items-center gap-1">
+                      {/* Raw Data Sheet */}
+                      <Sheet>
+                        <SheetTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 text-muted-foreground hover:text-foreground text-xs p-2"
+                          >
+                            Show Raw Data
+                            <FileText className="h-3 w-3" />
+                          </Button>
+                        </SheetTrigger>
+                        <SheetContent className="w-[500px] sm:w-[700px] sm:max-w-[700px] overflow-y-auto">
+                          <SheetHeader>
+                            <SheetTitle>Raw Entry Data</SheetTitle>
+                            <SheetDescription>
+                              Original text and raw data for this mood entry
+                            </SheetDescription>
+                          </SheetHeader>
+                          <div className="mt-6 space-y-4">
+                            {/* Original Text */}
+                            {entry.original_text && (
+                              <div>
+                                <h4 className="text-sm font-medium mb-2">Original Text</h4>
+                                <div className="bg-muted p-3 rounded-md border">
+                                  <pre className="text-sm whitespace-pre-wrap break-words">
+                                    {escapeHtml(entry.original_text)}
+                                  </pre>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Raw Data Fields */}
                             <div>
-                              <h4 className="text-sm font-medium mb-2">Original Text</h4>
-                              <div className="bg-muted p-3 rounded-md border">
-                                <pre className="text-sm whitespace-pre-wrap break-words">
-                                  {escapeHtml(entry.original_text)}
-                                </pre>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Raw Data Fields */}
-                          <div>
-                            <h4 className="text-sm font-medium mb-2">Raw Data</h4>
-                            <div className="space-y-2 text-sm">
-                              {/* Core Fields */}
-                              <div className="grid grid-cols-2 gap-2">
-                                <span className="font-medium">ID:</span>
-                                <span className="font-mono text-xs">{entry.id}</span>
-                              </div>
-
-                              {entry.email_entry_id && (
+                              <h4 className="text-sm font-medium mb-2">Raw Data</h4>
+                              <div className="space-y-2 text-sm">
+                                {/* Core Fields */}
                                 <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Email Entry ID:</span>
-                                  <span className="font-mono text-xs">{entry.email_entry_id}</span>
+                                  <span className="font-medium">ID:</span>
+                                  <span className="font-mono text-xs">{entry.id}</span>
                                 </div>
-                              )}
 
-                              {entry.subject && (
+                                {entry.email_entry_id && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Email Entry ID:</span>
+                                    <span className="font-mono text-xs">
+                                      {entry.email_entry_id}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {entry.subject && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Subject:</span>
+                                    <span className="text-xs break-words">
+                                      {escapeHtml(entry.subject)}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {/* Mood Data */}
                                 <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Subject:</span>
-                                  <span className="text-xs break-words">
-                                    {escapeHtml(entry.subject)}
-                                  </span>
+                                  <span className="font-medium">Mood Score:</span>
+                                  <span className="font-mono text-xs">{entry.mood_score}/10</span>
                                 </div>
-                              )}
 
-                              {/* Mood Data */}
-                              <div className="grid grid-cols-2 gap-2">
-                                <span className="font-medium">Mood Score:</span>
-                                <span className="font-mono text-xs">{entry.mood_score}/10</span>
-                              </div>
+                                {entry.energy_level && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Energy Level:</span>
+                                    <span className="font-mono text-xs">
+                                      {entry.energy_level}/10
+                                    </span>
+                                  </div>
+                                )}
 
-                              {entry.energy_level && (
+                                {entry.stress_level && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Stress Level:</span>
+                                    <span className="font-mono text-xs">
+                                      {entry.stress_level}/10
+                                    </span>
+                                  </div>
+                                )}
+
+                                {entry.sleep_hours && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Sleep Hours:</span>
+                                    <span className="font-mono text-xs">{entry.sleep_hours}h</span>
+                                  </div>
+                                )}
+
+                                {/* Text Fields */}
+                                {entry.note && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Note:</span>
+                                    <span className="text-xs break-words">
+                                      {escapeHtml(entry.note)}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {entry.weather && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Weather:</span>
+                                    <span className="text-xs">{escapeHtml(entry.weather)}</span>
+                                  </div>
+                                )}
+
+                                {entry.activity && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">Activity:</span>
+                                    <span className="text-xs break-words">
+                                      {escapeHtml(entry.activity)}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {/* Source Information */}
                                 <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Energy Level:</span>
-                                  <span className="font-mono text-xs">{entry.energy_level}/10</span>
+                                  <span className="font-medium">From:</span>
+                                  <span className="font-mono text-xs">{entry.from || 'N/A'}</span>
                                 </div>
-                              )}
 
-                              {entry.stress_level && (
+                                {entry.from_name && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <span className="font-medium">From Name:</span>
+                                    <span className="font-mono text-xs">{entry.from_name}</span>
+                                  </div>
+                                )}
+
+                                {/* Timestamps */}
                                 <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Stress Level:</span>
-                                  <span className="font-mono text-xs">{entry.stress_level}/10</span>
+                                  <span className="font-medium">Created At:</span>
+                                  <span className="font-mono text-xs">{entry.created_at}</span>
                                 </div>
-                              )}
-
-                              {entry.sleep_hours && (
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Sleep Hours:</span>
-                                  <span className="font-mono text-xs">{entry.sleep_hours}h</span>
-                                </div>
-                              )}
-
-                              {/* Text Fields */}
-                              {entry.note && (
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Note:</span>
-                                  <span className="text-xs break-words">
-                                    {escapeHtml(entry.note)}
-                                  </span>
-                                </div>
-                              )}
-
-                              {entry.weather && (
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Weather:</span>
-                                  <span className="text-xs">{escapeHtml(entry.weather)}</span>
-                                </div>
-                              )}
-
-                              {entry.activity && (
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">Activity:</span>
-                                  <span className="text-xs break-words">
-                                    {escapeHtml(entry.activity)}
-                                  </span>
-                                </div>
-                              )}
-
-                              {/* Source Information */}
-                              <div className="grid grid-cols-2 gap-2">
-                                <span className="font-medium">From:</span>
-                                <span className="font-mono text-xs">{entry.from || 'N/A'}</span>
-                              </div>
-
-                              {entry.from_name && (
-                                <div className="grid grid-cols-2 gap-2">
-                                  <span className="font-medium">From Name:</span>
-                                  <span className="font-mono text-xs">{entry.from_name}</span>
-                                </div>
-                              )}
-
-                              {/* Timestamps */}
-                              <div className="grid grid-cols-2 gap-2">
-                                <span className="font-medium">Created At:</span>
-                                <span className="font-mono text-xs">{entry.created_at}</span>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </SheetContent>
-                    </Sheet>
+                        </SheetContent>
+                      </Sheet>
+
+                      {/* Delete Button with Confirmation */}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 text-muted-foreground hover:text-red-600 text-xs p-2"
+                            disabled={deletingEntryId === entry.id}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Mood Entry</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this mood entry? This action cannot be
+                              undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteEntry(entry.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                              disabled={deletingEntryId === entry.id}
+                            >
+                              {deletingEntryId === entry.id ? 'Deleting...' : 'Delete'}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
 
                   {/* Unified Badge Section */}

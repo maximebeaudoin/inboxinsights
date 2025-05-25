@@ -117,3 +117,67 @@ export const signOutAction = async () => {
   await supabase.auth.signOut();
   return redirect('/sign-in');
 };
+
+export const deleteMoodEntryAction = async (entryId: string) => {
+  const supabase = await createClient();
+
+  // Get the current user
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return {
+      success: false,
+      error: 'Authentication required',
+    };
+  }
+
+  try {
+    // First, verify that the mood entry belongs to the current user
+    const { data: moodEntry, error: fetchError } = await supabase
+      .from('mood_entries')
+      .select('from')
+      .eq('id', entryId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching mood entry:', fetchError);
+      return {
+        success: false,
+        error: 'Mood entry not found',
+      };
+    }
+
+    // Check if the user owns this mood entry
+    if (moodEntry.from !== user.email) {
+      return {
+        success: false,
+        error: 'You can only delete your own mood entries',
+      };
+    }
+
+    // Delete the mood entry
+    const { error: deleteError } = await supabase.from('mood_entries').delete().eq('id', entryId);
+
+    if (deleteError) {
+      console.error('Error deleting mood entry:', deleteError);
+      return {
+        success: false,
+        error: 'Failed to delete mood entry',
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Mood entry deleted successfully',
+    };
+  } catch (error) {
+    console.error('Unexpected error in deleteMoodEntryAction:', error);
+    return {
+      success: false,
+      error: 'An unexpected error occurred',
+    };
+  }
+};
