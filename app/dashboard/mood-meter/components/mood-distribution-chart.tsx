@@ -2,13 +2,13 @@
 
 import { useMemo, useState } from 'react';
 
-import { subDays } from 'date-fns';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
+import { moodAnalytics } from '@/lib/services/mood-analytics';
 import type { MoodEntry } from '@/lib/types/mood-entry';
 
 interface MoodDistributionChartProps {
@@ -56,69 +56,34 @@ export function MoodDistributionChart({ moodEntries }: MoodDistributionChartProp
   const { distributionData, stats, trends } = useMemo(() => {
     if (moodEntries.length === 0) return { distributionData: [], stats: null, trends: null };
 
-    const distribution = {
-      '1-3': 0,
-      '4-5': 0,
-      '6-7': 0,
-      '8-10': 0,
-    };
+    // Use centralized analytics service
+    const analytics = moodAnalytics.generateComprehensiveAnalytics(moodEntries);
+    const distributionChartData = moodAnalytics.prepareDistributionChartData(moodEntries);
 
-    // Calculate distribution
-    moodEntries.forEach((entry) => {
-      const score = entry.mood_score;
-      if (score >= 1 && score <= 3) distribution['1-3']++;
-      else if (score >= 4 && score <= 5) distribution['4-5']++;
-      else if (score >= 6 && score <= 7) distribution['6-7']++;
-      else if (score >= 8 && score <= 10) distribution['8-10']++;
+    // Enhance chart data with mood range metadata
+    const chartData = distributionChartData.map((item) => {
+      const rangeInfo = moodRanges.find((range) => range.range === item.range);
+      return {
+        ...item,
+        ...rangeInfo,
+      };
     });
-
-    const chartData = moodRanges.map((range) => ({
-      ...range,
-      value: distribution[range.range as keyof typeof distribution],
-      percentage: Math.round(
-        (distribution[range.range as keyof typeof distribution] / moodEntries.length) * 100
-      ),
-    }));
-
-    // Calculate statistics
-    const totalEntries = moodEntries.length;
-    const averageMood =
-      moodEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / totalEntries;
-    const positiveEntries = distribution['6-7'] + distribution['8-10'];
-    const positivePercentage = Math.round((positiveEntries / totalEntries) * 100);
-
-    // Calculate trends (last 7 days vs previous 7 days)
-    const now = new Date();
-    const last7Days = moodEntries.filter((entry) => new Date(entry.created_at) >= subDays(now, 7));
-    const previous7Days = moodEntries.filter((entry) => {
-      const entryDate = new Date(entry.created_at);
-      return entryDate >= subDays(now, 14) && entryDate < subDays(now, 7);
-    });
-
-    let trendDirection = null;
-    let trendValue = 0;
-
-    if (last7Days.length > 0 && previous7Days.length > 0) {
-      const recentAvg =
-        last7Days.reduce((sum, entry) => sum + entry.mood_score, 0) / last7Days.length;
-      const previousAvg =
-        previous7Days.reduce((sum, entry) => sum + entry.mood_score, 0) / previous7Days.length;
-      trendValue = Math.abs(recentAvg - previousAvg);
-      trendDirection = recentAvg > previousAvg ? 'up' : recentAvg < previousAvg ? 'down' : 'stable';
-    }
 
     return {
       distributionData: chartData,
       stats: {
-        totalEntries,
-        averageMood,
-        positivePercentage,
-        mostCommon: chartData.reduce((max, current) => (current.value > max.value ? current : max)),
+        totalEntries: analytics.basicStats.count,
+        averageMood: analytics.basicStats.average,
+        positivePercentage: analytics.distribution.positivePercentage,
+        mostCommon: {
+          ...analytics.distribution.mostCommon,
+          ...moodRanges.find((range) => range.range === analytics.distribution.mostCommon.range),
+        },
       },
       trends: {
-        direction: trendDirection,
-        value: trendValue,
-        recentCount: last7Days.length,
+        direction: analytics.trends.weekly?.direction || null,
+        value: analytics.trends.weekly?.value || 0,
+        recentCount: analytics.recentActivity.last7Days,
       },
     };
   }, [moodEntries]);

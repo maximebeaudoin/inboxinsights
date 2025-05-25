@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { format, parseISO, subDays } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { BarChart3, LineChart as LineChartIcon, TrendingDown, TrendingUp, Zap } from 'lucide-react';
 import {
   Area,
@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
+import { moodAnalytics } from '@/lib/services/mood-analytics';
 import type { MoodEntry } from '@/lib/types/mood-entry';
 
 interface MoodChartProps {
@@ -90,89 +91,39 @@ export function MoodChart({ moodEntries }: MoodChartProps) {
   const { chartData, stats, insights } = useMemo(() => {
     if (moodEntries.length === 0) return { chartData: [], stats: null, insights: null };
 
-    // Filter data based on time selection
-    const now = new Date();
-    let filteredEntries = moodEntries;
+    // Use centralized analytics service
+    const chartData = moodAnalytics.prepareChartData(moodEntries, timeFilter);
+    const analytics = moodAnalytics.generateComprehensiveAnalytics(moodEntries);
 
-    if (timeFilter === '7d') {
-      filteredEntries = moodEntries.filter(
-        (entry) => new Date(entry.created_at) >= subDays(now, 7)
-      );
-    } else if (timeFilter === '30d') {
-      filteredEntries = moodEntries.filter(
-        (entry) => new Date(entry.created_at) >= subDays(now, 30)
-      );
-    }
-
-    // Create a copy of the array before sorting to avoid mutating the original
-    const sortedEntries = [...filteredEntries].sort(
-      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    );
-
-    const data = sortedEntries.map((entry) => ({
-      date: format(new Date(entry.created_at), 'MMM dd'),
-      fullDate: entry.created_at,
-      mood: entry.mood_score,
-      energy: entry.energy_level || null,
-      stress: entry.stress_level || null,
-      sleep: entry.sleep_hours || null,
-      note: entry.note || '',
-      activity: entry.activity || '',
-      weather: entry.weather || '',
-    }));
-
-    // Calculate statistics
-    const averageMood = data.reduce((sum, entry) => sum + entry.mood, 0) / data.length;
-    const moodScores = data.map((d) => d.mood);
-    const minMood = Math.min(...moodScores);
-    const maxMood = Math.max(...moodScores);
-
-    // Calculate trend (last 3 vs previous 3 entries)
-    let trend = null;
-    if (data.length >= 6) {
-      const recent = data.slice(-3).reduce((sum, entry) => sum + entry.mood, 0) / 3;
-      const previous = data.slice(-6, -3).reduce((sum, entry) => sum + entry.mood, 0) / 3;
-      const difference = recent - previous;
-      trend = {
-        direction: difference > 0.5 ? 'up' : difference < -0.5 ? 'down' : 'stable',
-        value: Math.abs(difference),
+    // Add additional fields for chart display
+    const enhancedChartData = chartData.map((point, index) => {
+      const originalEntry = moodEntries.find((entry) => entry.created_at === point.fullDate);
+      return {
+        ...point,
+        note: originalEntry?.note || '',
+        activity: originalEntry?.activity || '',
+        weather: originalEntry?.weather || '',
       };
-    }
-
-    // Find streaks
-    let currentStreak = 0;
-    let longestStreak = 0;
-    let streakType = null;
-
-    for (let i = data.length - 1; i >= 0; i--) {
-      const isPositive = data[i].mood >= 6;
-      if (i === data.length - 1) {
-        currentStreak = 1;
-        streakType = isPositive ? 'positive' : 'negative';
-      } else {
-        const prevPositive = data[i + 1].mood >= 6;
-        if (isPositive === prevPositive) {
-          currentStreak++;
-        } else {
-          break;
-        }
-      }
-    }
-    longestStreak = currentStreak;
+    });
 
     return {
-      chartData: data,
+      chartData: enhancedChartData,
       stats: {
-        average: averageMood,
-        min: minMood,
-        max: maxMood,
-        range: maxMood - minMood,
-        trend,
-        streak: { length: longestStreak, type: streakType },
+        average: analytics.basicStats.average,
+        min: analytics.basicStats.min,
+        max: analytics.basicStats.max,
+        range: analytics.basicStats.range,
+        trend: analytics.trends.recent,
+        streak: analytics.streaks.current,
       },
       insights: {
-        dominantMood: averageMood >= 7 ? 'positive' : averageMood >= 4 ? 'neutral' : 'challenging',
-        consistency: maxMood - minMood <= 3 ? 'stable' : 'variable',
+        dominantMood:
+          analytics.basicStats.average >= 7
+            ? 'positive'
+            : analytics.basicStats.average >= 4
+              ? 'neutral'
+              : 'challenging',
+        consistency: analytics.basicStats.range <= 3 ? 'stable' : 'variable',
       },
     };
   }, [moodEntries, timeFilter]);

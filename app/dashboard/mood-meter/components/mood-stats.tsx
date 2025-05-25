@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
+import { moodAnalytics } from '@/lib/services/mood-analytics';
 import type { MoodEntry } from '@/lib/types/mood-entry';
 
 interface MoodStatsProps {
@@ -28,191 +29,51 @@ export function MoodStats({ moodEntries }: MoodStatsProps) {
       };
     }
 
-    // Time of day patterns
-    const timePatterns = {
-      morning: moodEntries.filter((entry) => {
-        const hour = new Date(entry.created_at).getHours();
-        return hour >= 6 && hour < 12;
-      }),
-      afternoon: moodEntries.filter((entry) => {
-        const hour = new Date(entry.created_at).getHours();
-        return hour >= 12 && hour < 18;
-      }),
-      evening: moodEntries.filter((entry) => {
-        const hour = new Date(entry.created_at).getHours();
-        return hour >= 18 || hour < 6;
-      }),
-    };
-
-    const timeAverages = {
-      morning:
-        timePatterns.morning.length > 0
-          ? timePatterns.morning.reduce((sum, entry) => sum + entry.mood_score, 0) /
-            timePatterns.morning.length
-          : 0,
-      afternoon:
-        timePatterns.afternoon.length > 0
-          ? timePatterns.afternoon.reduce((sum, entry) => sum + entry.mood_score, 0) /
-            timePatterns.afternoon.length
-          : 0,
-      evening:
-        timePatterns.evening.length > 0
-          ? timePatterns.evening.reduce((sum, entry) => sum + entry.mood_score, 0) /
-            timePatterns.evening.length
-          : 0,
-    };
-
-    const bestTimeOfDay = Object.entries(timeAverages).reduce(
-      (best, [time, avg]) => (avg > best.avg ? { time, avg } : best),
-      { time: 'morning', avg: 0 }
-    );
-
-    // Weekday patterns
-    const weekdayPatterns = [
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-    ].map((day) => {
-      const dayEntries = moodEntries.filter((entry) => {
-        const entryDay = new Date(entry.created_at).toLocaleDateString('en-US', {
-          weekday: 'long',
-        });
-        return entryDay === day;
-      });
-      return {
-        day,
-        count: dayEntries.length,
-        average:
-          dayEntries.length > 0
-            ? dayEntries.reduce((sum, entry) => sum + entry.mood_score, 0) / dayEntries.length
-            : 0,
-      };
-    });
-
-    const bestWeekday = weekdayPatterns.reduce((best, current) =>
-      current.average > best.average ? current : best
-    );
-
-    // Recent activity (last 7 days)
-    const last7Days = moodEntries.filter((entry) => {
-      const entryDate = new Date(entry.created_at);
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      return entryDate >= weekAgo;
-    });
-
-    // Correlations
-    const correlations = {
-      sleepMood: calculateCorrelation(moodEntries, 'sleep_hours', 'mood_score'),
-      energyMood: calculateCorrelation(moodEntries, 'energy_level', 'mood_score'),
-      stressMood: calculateCorrelation(moodEntries, 'stress_level', 'mood_score'),
-    };
-
-    // Personal bests
-    const personalBests = {
-      highestMood: Math.max(...moodEntries.map((e) => e.mood_score)),
-      bestWeek: getBestWeek(moodEntries),
-      longestStreak: getLongestPositiveStreak(moodEntries),
-    };
+    // Use centralized analytics service
+    const analytics = moodAnalytics.generateComprehensiveAnalytics(moodEntries);
 
     return {
       timePatterns: {
-        averages: timeAverages,
-        bestTime: bestTimeOfDay,
-        distribution: timePatterns,
-      },
-      correlations,
-      recentActivity: {
-        last7Days: last7Days.length,
-        recentAverage:
-          last7Days.length > 0
-            ? last7Days.reduce((sum, entry) => sum + entry.mood_score, 0) / last7Days.length
+        averages: {
+          morning: analytics.timePatterns.morning.average,
+          afternoon: analytics.timePatterns.afternoon.average,
+          evening: analytics.timePatterns.evening.average,
+        },
+        bestTime: {
+          time: analytics.timePatterns.bestTime || 'morning',
+          avg: analytics.timePatterns.bestTime
+            ? analytics.timePatterns[analytics.timePatterns.bestTime].average
             : 0,
+        },
+        distribution: {
+          morning: analytics.timePatterns.morning.entries,
+          afternoon: analytics.timePatterns.afternoon.entries,
+          evening: analytics.timePatterns.evening.entries,
+        },
       },
+      correlations: analytics.correlations,
+      recentActivity: analytics.recentActivity,
       weekdayPatterns: {
-        patterns: weekdayPatterns,
-        bestDay: bestWeekday,
+        patterns: Object.entries(analytics.weekdayPatterns)
+          .filter(([key]) => key !== 'bestDay')
+          .map(([day, data]) => ({
+            day,
+            count: data.count,
+            average: data.average,
+          })),
+        bestDay: analytics.weekdayPatterns.bestDay
+          ? {
+              day: analytics.weekdayPatterns.bestDay,
+              average: analytics.weekdayPatterns[analytics.weekdayPatterns.bestDay].average,
+              count: analytics.weekdayPatterns[analytics.weekdayPatterns.bestDay].count,
+            }
+          : { day: 'Monday', average: 0, count: 0 },
       },
-      personalBests,
+      personalBests: analytics.personalBests,
     };
   }, [moodEntries]);
 
-  // Helper functions
-  function calculateCorrelation(
-    entries: MoodEntry[],
-    field1: keyof MoodEntry,
-    field2: keyof MoodEntry
-  ) {
-    const validEntries = entries.filter((entry) => entry[field1] && entry[field2]);
-    if (validEntries.length < 3) return null;
-
-    // Simple correlation calculation
-    const values1 = validEntries.map((entry) => Number(entry[field1]));
-    const values2 = validEntries.map((entry) => Number(entry[field2]));
-
-    const mean1 = values1.reduce((sum, val) => sum + val, 0) / values1.length;
-    const mean2 = values2.reduce((sum, val) => sum + val, 0) / values2.length;
-
-    const numerator = values1.reduce(
-      (sum, val, i) => sum + (val - mean1) * (values2[i] - mean2),
-      0
-    );
-    const denominator = Math.sqrt(
-      values1.reduce((sum, val) => sum + Math.pow(val - mean1, 2), 0) *
-        values2.reduce((sum, val) => sum + Math.pow(val - mean2, 2), 0)
-    );
-
-    return denominator === 0 ? 0 : numerator / denominator;
-  }
-
-  function getBestWeek(entries: MoodEntry[]) {
-    // Group entries by week and find the best average
-    const weeks = new Map();
-    entries.forEach((entry) => {
-      const date = new Date(entry.created_at);
-      const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
-      const weekKey = weekStart.toISOString().split('T')[0];
-
-      if (!weeks.has(weekKey)) {
-        weeks.set(weekKey, []);
-      }
-      weeks.get(weekKey).push(entry.mood_score);
-    });
-
-    let bestWeek = { week: '', average: 0 };
-    weeks.forEach((scores, week) => {
-      const average = scores.reduce((sum: number, score: number) => sum + score, 0) / scores.length;
-      if (average > bestWeek.average) {
-        bestWeek = { week, average };
-      }
-    });
-
-    return bestWeek;
-  }
-
-  function getLongestPositiveStreak(entries: MoodEntry[]) {
-    const sortedEntries = [...entries].sort(
-      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    );
-
-    let longestStreak = 0;
-    let currentStreak = 0;
-
-    sortedEntries.forEach((entry) => {
-      if (entry.mood_score >= 7) {
-        currentStreak++;
-        longestStreak = Math.max(longestStreak, currentStreak);
-      } else {
-        currentStreak = 0;
-      }
-    });
-
-    return longestStreak;
-  }
+  // Note: Helper functions moved to centralized mood-analytics service
 
   if (!insights.timePatterns) {
     return (
@@ -440,7 +301,7 @@ export function MoodStats({ moodEntries }: MoodStatsProps) {
                   <span className="text-xs">Longest Streak</span>
                 </div>
                 <Badge variant="secondary" className="text-xs h-5">
-                  {insights.personalBests.longestStreak} days
+                  {insights.personalBests.longestStreak.length} days
                 </Badge>
               </div>
 
@@ -450,7 +311,7 @@ export function MoodStats({ moodEntries }: MoodStatsProps) {
                   <span className="text-xs">Best Week</span>
                 </div>
                 <Badge variant="outline" className="text-xs h-5">
-                  {insights.personalBests.bestWeek.average.toFixed(1)}/10
+                  {insights.personalBests.bestWeek?.average.toFixed(1) || '0.0'}/10
                 </Badge>
               </div>
             </div>
