@@ -11,8 +11,8 @@ export const APP_CONFIG = {
    * Note: These credentials should exist in your authentication system
    */
   demo: {
-    email: 'demo@example.com',
-    password: 'demopassword123',
+    email: 'maxime.l.beaudoin@gmail.com',
+    password: 'e?iF7jmy!Y5RbdYt',
     description: 'Demo account with pre-populated mood data for testing',
   },
 
