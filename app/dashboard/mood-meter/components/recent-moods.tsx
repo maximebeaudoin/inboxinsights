@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { format, formatDistanceToNow } from 'date-fns';
 import { FileText, Info, Trash2 } from 'lucide-react';
@@ -28,6 +28,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+import { createClient } from '@/utils/supabase/client';
 
 import { deleteMoodEntryAction } from '@/app/actions';
 
@@ -85,7 +87,26 @@ const getMoodColor = (score: number) => {
 
 export function RecentMoods({ moodEntries }: RecentMoodsProps) {
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   const { toast } = useToast();
+  const supabase = createClient();
+
+  // Get current user email
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setCurrentUserEmail(user?.email || null);
+    };
+
+    getCurrentUser();
+  }, [supabase]);
+
+  // Check if current user can delete this entry
+  const canDeleteEntry = (entry: MoodEntry): boolean => {
+    return currentUserEmail !== null && entry.from === currentUserEmail;
+  };
 
   const handleDeleteEntry = async (entryId: string) => {
     setDeletingEntryId(entryId);
@@ -175,7 +196,7 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-auto p-0 text-muted-foreground hover:text-foreground text-xs p-2"
+                            className="h-auto p-0 text-muted-foreground hover:text-foreground text-xs p-1"
                           >
                             Show Raw Data
                             <FileText className="h-3 w-3" />
@@ -310,38 +331,40 @@ export function RecentMoods({ moodEntries }: RecentMoodsProps) {
                         </SheetContent>
                       </Sheet>
 
-                      {/* Delete Button with Confirmation */}
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 text-muted-foreground hover:text-red-600 text-xs p-2"
-                            disabled={deletingEntryId === entry.id}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Mood Entry</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete this mood entry? This action cannot be
-                              undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteEntry(entry.id)}
-                              className="bg-red-600 hover:bg-red-700"
+                      {/* Delete Button with Confirmation - Only show if user can delete */}
+                      {canDeleteEntry(entry) && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 text-muted-foreground hover:text-red-600 text-xs p-1"
                               disabled={deletingEntryId === entry.id}
                             >
-                              {deletingEntryId === entry.id ? 'Deleting...' : 'Delete'}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Mood Entry</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete this mood entry? This action cannot
+                                be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteEntry(entry.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                                disabled={deletingEntryId === entry.id}
+                              >
+                                {deletingEntryId === entry.id ? 'Deleting...' : 'Delete'}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                     </div>
                   </div>
 
