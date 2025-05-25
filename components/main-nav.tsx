@@ -1,6 +1,10 @@
 import Link from 'next/link';
 
+import { HelpCircle } from 'lucide-react';
+
 import HeaderAuth from '@/components/header-auth';
+import { InstructionsSheet } from '@/components/instructions-sheet';
+import { Button } from '@/components/ui/button';
 
 export default function MainNav() {
   return (
@@ -9,7 +13,15 @@ export default function MainNav() {
         <div className="flex gap-5 items-center font-semibold">
           <Link href={'/dashboard/mood-meter'}>InboxInsights - Mood Meter</Link>
         </div>
-        <HeaderAuth />
+        <div className="flex items-center gap-4">
+          <InstructionsSheet>
+            <Button variant="ghost" size="sm" className="flex items-center gap-2">
+              <HelpCircle className="h-4 w-4" />
+              Help
+            </Button>
+          </InstructionsSheet>
+          <HeaderAuth />
+        </div>
       </div>
     </nav>
   );
