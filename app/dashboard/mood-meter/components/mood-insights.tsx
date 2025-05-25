@@ -196,7 +196,7 @@ export function MoodInsights({ moodEntries }: MoodInsightsProps) {
   }, [moodEntries]);
 
   return (
-    <div className="space-y-6">
+    <div className="grid gap-6 lg:grid-cols-2">
       {/* Mood Health Score */}
       <Card>
         <CardHeader>
