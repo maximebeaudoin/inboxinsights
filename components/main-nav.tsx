@@ -6,9 +6,8 @@ import Link from 'next/link';
 
 import type { User } from '@supabase/supabase-js';
 
-import { BarChart3, HelpCircle, Menu, X } from 'lucide-react';
+import { BarChart3, Menu, X } from 'lucide-react';
 
-import { InstructionsSheet } from '@/components/instructions-sheet';
 import { ThemeSwitcher } from '@/components/theme-switcher';
 import { Button } from '@/components/ui/button';
 import {
@@ -67,12 +66,6 @@ export default function MainNav({ user }: MainNavProps) {
         {/* Desktop Navigation */}
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <nav className="hidden items-center space-x-2 md:flex">
-            <InstructionsSheet>
-              <Button variant="ghost" size="sm">
-                <HelpCircle className="h-4 w-4" />
-                <span className="sr-only">Help</span>
-              </Button>
-            </InstructionsSheet>
             <ThemeSwitcher />
           </nav>
           <ClientHeaderAuth user={user} />
@@ -105,13 +98,6 @@ function MobileNav() {
 
         {/* Mobile Navigation Actions */}
         <div className="flex flex-col space-y-3 pt-4 border-t">
-          <InstructionsSheet>
-            <Button variant="ghost" className="justify-start" size="sm">
-              <HelpCircle className="mr-2 h-4 w-4" />
-              Help & Instructions
-            </Button>
-          </InstructionsSheet>
-
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Theme</span>
             <ThemeSwitcher />
