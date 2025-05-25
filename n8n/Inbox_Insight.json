@@ -1,0 +1,421 @@
+{
+  "name": "Inbox Insight",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f12fc46a-945f-48c0-84d0-8884ea0eecf6",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, -190],
+      "id": "195f6da3-4844-48e6-b3a0-2050b7098312",
+      "name": "Webhook",
+      "webhookId": "f12fc46a-945f-48c0-84d0-8884ea0eecf6"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "mood_entries",
+          "mode": "list",
+          "cachedResultName": "mood_entries"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mood_score": "={{ $json.message.content.mood_score }}",
+            "energy_level": "={{ $json.message.content.energy_level }}",
+            "sleep_hours": "={{ $json.message.content.sleep_hours }}",
+            "email_entry_id": "={{ $('Webhook').item.json.body.MessageID }}",
+            "activity": "={{ $json.message.content.activity }}",
+            "note": "={{ $json.message.content.note }}",
+            "stress_level": "={{ $json.message.content.stress_level }}",
+            "weather": "={{ $json.message.content.weather }}",
+            "from": "={{ $('Webhook').item.json.body.From }}",
+            "original_text": "={{ $('Webhook').item.json.body.TextBody }}",
+            "from_name": "={{ $('Webhook').item.json.body.FromName }}",
+            "subject": "={{ $('Webhook').item.json.body.Subject }}"
+          },
+          "matchingColumns": ["email_entry_id"],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email_entry_id",
+              "displayName": "email_entry_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mood_score",
+              "displayName": "mood_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "energy_level",
+              "displayName": "energy_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "stress_level",
+              "displayName": "stress_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "note",
+              "displayName": "note",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "weather",
+              "displayName": "weather",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "sleep_hours",
+              "displayName": "sleep_hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "activity",
+              "displayName": "activity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "original_text",
+              "displayName": "original_text",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "from",
+              "displayName": "from",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "from_name",
+              "displayName": "from_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false,
+              "removed": true
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1036, -40],
+      "id": "f96b22b1-6267-44fc-8ea3-b0faad22c7be",
+      "name": "Mood Table Insert",
+      "credentials": {
+        "postgres": {
+          "id": "a2wOnAuYIZFZZfNU",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# Email Parsing Prompt for Sleep & Wellness Data Extraction\n\n## System Instructions\nYou are an AI assistant specialized in extracting sleep and wellness data from personal emails. Your task is to analyze email content and subject line to extract specific health-related metrics in a structured JSON format.\n\n## Core Task\nParse the provided email content and subject line to extract the following fields as accurately as possible:\n\n### Required Fields:\n- **sleep_hours**: Number of hours slept (extract from text, estimate if approximate)\n- **mood_score**: Mood rating from 1-10 (1=very bad, 10=excellent)\n- **energy_level**: Energy level from 1-10 (1=exhausted, 10=very energetic)\n- **activity**: Brief summary of activities mentioned\n- **stress_level**: Stress level from 1-10 (1=very relaxed, 10=extremely stressed)\n- **weather**: Weather information if mentioned (null if not discussed)\n- **note**: Encouraging message summarizing the user's day and accomplishments\n\n## Parsing Guidelines\n\n### Email Subject Analysis:\n- Analyze the subject line for mood indicators, urgency, or wellness themes\n- Look for keywords like: \"great day\", \"rough night\", \"feeling better\", \"stressed out\"\n- Consider emojis or special characters that indicate emotional state\n- Use subject context to inform mood and stress level scoring\n\n### Historical Context Integration:\n- If historical mood data is provided, review the user's latest mood entry\n- Compare current mood indicators with previous entry to identify trends when available\n- Note improvements or declines in wellness metrics if historical data exists\n- Use historical context to provide more accurate assessments when possible\n- If no historical data available, analyze current email independently\n\n### Sleep Hours Extraction:\n- Look for explicit mentions: \"slept 8 hours\", \"got 6.5 hours of sleep\"\n- Parse time ranges: \"went to bed at 10pm, woke up at 6am\" = 8 hours\n- Handle approximations: \"slept poorly\", \"barely got any sleep\" = estimate low (3-5 hours)\n- If unclear but sleep is mentioned, provide best estimate\n- If no sleep info found, return null\n\n### Mood Score (1-10):\n- **1-3**: Terrible, awful, depressed, very sad, miserable\n- **4-5**: Bad, down, not great, struggling, frustrated  \n- **6-7**: Okay, fine, average, neutral, so-so\n- **8-9**: Good, happy, positive, great, upbeat\n- **10**: Excellent, amazing, fantastic, euphoric, perfect\n\n### Energy Level (1-10):\n- **1-3**: Exhausted, drained, no energy, can't function\n- **4-5**: Tired, low energy, sluggish, dragging\n- **6-7**: Moderate energy, okay, getting by\n- **8-9**: Energetic, good energy, productive, active\n- **10**: Super energetic, full of energy, unstoppable\n\n### Activity Summary:\n- Summarize main activities mentioned in 1-2 sentences\n- Focus on significant events, not routine tasks\n- If no activities mentioned, return \"No specific activities mentioned\"\n\n### Stress Level (1-10):\n- **1-3**: Very relaxed, calm, peaceful, zen, no worries\n- **4-5**: Mild stress, some concerns, manageable pressure\n- **6-7**: Moderate stress, noticeable pressure, some anxiety\n- **8-9**: High stress, overwhelmed, anxious, pressure\n- **10**: Extreme stress, panic, crisis mode, breaking point\n\n### Weather Information:\n- Extract any weather mentions: sunny, rainy, cold, hot, temperature, etc.\n- Include temperature if mentioned\n- If no weather discussed, return null\n- Format as brief description: \"Sunny and warm\", \"Rainy, 15°C\"\n\n### Encouraging Note:\n- Create a personalized, encouraging message (2-3 sentences)\n- **Always include the user's name** to make it personal and engaging\n- **Reference historical context if provided** (e.g., \"I noticed your mood improved since last time!\")\n- Acknowledge the user's activities and efforts positively\n- Highlight any accomplishments or positive aspects mentioned\n- **Compare with previous entries if available** to celebrate improvements or offer support for challenges\n- Offer gentle motivation or recognition\n- Keep tone warm, supportive, and uplifting\n- Examples: \n  - With history: \"Great job getting that workout in despite feeling tired, Sarah! I can see your energy levels are improving compared to last week.\"\n  - Without history: \"Great job getting that workout in despite feeling tired, Sarah! Taking care of your health shows real commitment.\"\n\n## Output Format\nAlways respond with valid JSON only:\n\n```json\n{\n  \"sleep_hours\": 7.5,\n  \"mood_score\": 6,\n  \"energy_level\": 4,\n  \"activity\": \"Worked from home, had lunch with Sarah, evening yoga class\",\n  \"stress_level\": 7,\n  \"weather\": \"Rainy and cold\",\n  \"note\": \"Nice work fitting in that yoga class even after a busy work day, Alex! Taking time for self-care shows you're prioritizing your wellbeing.\"\n}\n```\n\n## Important Rules:\n1. Always return valid JSON format\n2. Use null for missing information, not empty strings\n3. Numbers should be integers or decimals (not strings)\n4. **Consider both current email AND historical context if provided** when making assessments\n5. **Analyze email subject line** for additional mood/wellness indicators\n6. Be conservative with estimates - if unclear, err on the side of neutral values\n7. Focus on the overall tone and content, not individual words\n8. Consider context clues and implied information\n9. **Use historical trends if available** to provide more accurate and personalized notes\n\n## Example Analysis Process:\n1. **Analyze email subject line** for mood/wellness indicators\n2. **Review historical mood data if provided** to understand user's baseline and trends\n3. Read the entire email content thoroughly\n4. Identify explicit mentions of each field\n5. **Compare current state with previous entries if historical data available**\n6. Infer missing values from context, tone, and historical patterns when possible\n7. Rate subjective scores based on language patterns and available context\n8. **Create personalized note** that acknowledges progress or offers appropriate support\n9. Format as clean JSON response\n\n---\n\n## Input Data\n\n**User's name:** {{ $('Webhook').item.json.body.FromName }}\n\n**Email subject:** {{ $('Webhook').item.json.body.Subject }}\n\n**Historical mood data (optional):** No historical data for now\n*Note: This may be null if no previous entries exist. If available, this contains the user's previous mood_score, energy_level, stress_level, sleep_hours, created_at timestamp, and activity summary.*\n\n**Email content to analyze:**\n{{ $('Webhook').item.json.body.TextBody }}\n\nPlease analyze the above information and return the extracted data in the specified JSON format. Remember to use the user's name in the encouraging note and incorporate historical context if available.",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [660, -40],
+      "id": "9426a325-3c28-450a-b218-e7a8f475586e",
+      "name": "Aura Agent",
+      "credentials": {
+        "openAiApi": {
+          "id": "VkWcdO0yK7iczx0c",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "mood_entries",
+          "mode": "list",
+          "cachedResultName": "mood_entries"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "from",
+              "value": "={{ $('Webhook').item.json.body.From }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [748, 180],
+      "id": "2228bba8-579f-43a4-9b01-3217f936362a",
+      "name": "Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "a2wOnAuYIZFZZfNU",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "classify",
+        "input": "=From email address : {{ $json.body.From }}\nFrom : {{ $json.body.FromName }}\nSubject : {{ $json.body.Subject }}\nEmail Content : {{ $json.body.TextBody }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [220, -190],
+      "id": "6cf1568a-6bf6-46e2-93f1-a008e6b5232b",
+      "name": "Classify Text For Violations",
+      "credentials": {
+        "openAiApi": {
+          "id": "VkWcdO0yK7iczx0c",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "55c924b3-64ef-4299-9a98-533d07b80b90",
+              "leftValue": "={{ $json.flagged }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [440, -190],
+      "id": "63cb9f45-9cc0-4788-b715-c5b5dfce2225",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "fromEmail": "InboxInsights Alerts <violations@inboxinsights.me>",
+        "toEmail": "={{ $('Webhook').item.json.body.From }}",
+        "subject": "BLOCKED: Inappropriate Content Detected",
+        "emailFormat": "text",
+        "text": "=Your email sent on {{ $('Webhook').item.json.body.Date }} with the subject \"{{ $('Webhook').item.json.body.Subject }}\" has been BLOCKED due to inappropriate content.\n\n**VIOLATION DETECTED:**\nOur automated systems have identified content that violates our communication standards. This type of content is not acceptable and will not be tolerated.\n\n**IMMEDIATE ACTION REQUIRED:**\n- Your message has been permanently blocked\n- Further violations may result in your email address being blacklisted\n- All inappropriate communications are logged and may be reported\n\nIf you believe this action was taken in error, we are sorry! Don't forget it's just a demo project !\n\n\n---\nCompliance Department\nhttps://www.inboxinsights.me/\n\nReference ID: {{ $('Webhook').item.json.body.MessageID }}\nFrom : {{ $('Webhook').item.json.body.From }}",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "maxime.l.beaudoin@gmail.com"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [738, -340],
+      "id": "c48b0658-b2e4-40e3-9103-517b52467820",
+      "name": "Send Email",
+      "webhookId": "7e3b36ca-afcf-4be6-8f3a-4c815f790157",
+      "credentials": {
+        "smtp": {
+          "id": "CrgMHQg7ZfWlQhUe",
+          "name": "Postmark N8N"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Classify Text For Violations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aura Agent": {
+      "main": [
+        [
+          {
+            "node": "Mood Table Insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "ai_tool": [
+        [
+          {
+            "node": "Aura Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Text For Violations": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aura Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3785eab9-ce89-4688-a3c3-058518f22f17",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ec045710f17d4c255cf43b4ac8b15ef0fe0282614f5eb8b4b3cff367211cb1eb"
+  },
+  "id": "jCynVa9DbZDR8wnW",
+  "tags": []
+}
