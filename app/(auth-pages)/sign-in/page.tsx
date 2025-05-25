@@ -31,16 +31,20 @@ export default function Login() {
   };
 
   // Convert searchParams to Message format for FormMessage component
-  const message: Message = {};
-  if (searchParams.get('message')) {
-    message.message = searchParams.get('message')!;
-  }
-  if (searchParams.get('error')) {
-    message.error = searchParams.get('error')!;
-  }
-  if (searchParams.get('success')) {
-    message.success = searchParams.get('success')!;
-  }
+  const getFormMessage = (): Message | null => {
+    if (searchParams.get('error')) {
+      return { error: searchParams.get('error')! };
+    }
+    if (searchParams.get('success')) {
+      return { success: searchParams.get('success')! };
+    }
+    if (searchParams.get('message')) {
+      return { message: searchParams.get('message')! };
+    }
+    return null;
+  };
+
+  const message = getFormMessage();
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-background to-muted/20">
       <div className="flex flex-col gap-6 max-w-6xl w-full">
@@ -138,7 +142,7 @@ export default function Login() {
                     className="mt-2"
                   />
 
-                  <FormMessage message={message} />
+                  {message && <FormMessage message={message} />}
                 </form>
               </CardContent>
             </Card>
