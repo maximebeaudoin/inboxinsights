@@ -212,19 +212,19 @@ export function MoodDistributionChart({ moodEntries }: MoodDistributionChartProp
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          {/* Compact Donut Chart */}
+        <div className="space-y-3">
+          {/* Ultra Compact Donut Chart */}
           <div className="relative">
-            <div className="h-64">
+            <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={distributionData.filter((item) => item.value > 0)}
                     cx="50%"
                     cy="50%"
-                    innerRadius={45}
-                    outerRadius={95}
-                    paddingAngle={2}
+                    innerRadius={28}
+                    outerRadius={65}
+                    paddingAngle={1}
                     dataKey="value"
                     onMouseEnter={(_, index) => {
                       const item = distributionData.filter((item) => item.value > 0)[index];
@@ -255,7 +255,7 @@ export function MoodDistributionChart({ moodEntries }: MoodDistributionChartProp
             {/* Center Stats */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">
+                <div className="text-base font-bold text-foreground">
                   {stats?.positivePercentage}%
                 </div>
                 <div className="text-xs text-muted-foreground">Positive</div>
@@ -263,43 +263,40 @@ export function MoodDistributionChart({ moodEntries }: MoodDistributionChartProp
             </div>
           </div>
 
-          {/* Compact Legend with Progress Bars */}
-          <div className="space-y-3">
+          {/* Ultra Compact Legend */}
+          <div className="space-y-2">
             {distributionData.map((item) => (
               <div
                 key={item.range}
                 className={`
-                  p-3 rounded-lg border transition-all duration-200 cursor-pointer
+                  p-2 rounded border transition-all duration-200 cursor-pointer
                   ${
                     hoveredSegment === item.range
-                      ? 'border-primary/50 bg-primary/5 shadow-sm'
-                      : 'border-border hover:border-primary/30 hover:bg-muted/30'
+                      ? 'border-primary/50 bg-primary/5'
+                      : 'border-border hover:border-primary/30'
                   }
                 `}
                 onMouseEnter={() => setHoveredSegment(item.range)}
                 onMouseLeave={() => setHoveredSegment(null)}
               >
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-lg">{item.emoji}</span>
-                    <div>
-                      <p className="font-medium text-sm">{item.label}</p>
-                      <p className="text-xs text-muted-foreground">Score {item.range}</p>
-                    </div>
+                    <div
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="text-base">{item.emoji}</span>
+                    <span className="font-medium text-sm">{item.label}</span>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-lg">{item.percentage}%</p>
-                    <p className="text-xs text-muted-foreground">
-                      {item.value} {item.value === 1 ? 'entry' : 'entries'}
-                    </p>
+                    <span className="font-bold text-sm">{item.percentage}%</span>
                   </div>
                 </div>
 
-                {/* Compact Progress Bar */}
+                {/* Mini Progress Bar */}
                 <Progress
                   value={item.percentage}
-                  className="h-1.5"
+                  className="h-1"
                   style={
                     {
                       '--progress-background': item.lightColor,
@@ -311,30 +308,27 @@ export function MoodDistributionChart({ moodEntries }: MoodDistributionChartProp
             ))}
           </div>
 
-          {/* Compact Summary Stats */}
-          <div className="space-y-3 pt-4 border-t">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="text-center p-2 bg-muted/50 rounded-lg">
-                <div className="text-xl font-bold text-foreground">{stats?.totalEntries}</div>
+          {/* Ultra Compact Summary */}
+          <div className="space-y-2 pt-3 border-t">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="text-center p-1.5 bg-muted/50 rounded">
+                <div className="text-lg font-bold text-foreground">{stats?.totalEntries}</div>
                 <div className="text-xs text-muted-foreground">Total</div>
               </div>
-              <div className="text-center p-2 bg-muted/50 rounded-lg">
-                <div className="text-xl font-bold text-foreground">
+              <div className="text-center p-1.5 bg-muted/50 rounded">
+                <div className="text-lg font-bold text-foreground">
                   {stats?.averageMood.toFixed(1)}
                 </div>
                 <div className="text-xs text-muted-foreground">Average</div>
               </div>
             </div>
 
-            <div className="text-center p-3 bg-primary/10 rounded-lg border border-primary/20">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <span className="text-lg">{stats?.mostCommon.emoji}</span>
-                <span className="font-medium text-sm">Most Common</span>
+            <div className="text-center p-2 bg-primary/10 rounded border border-primary/20">
+              <div className="flex items-center justify-center gap-1 mb-0.5">
+                <span className="text-base">{stats?.mostCommon.emoji}</span>
+                <span className="font-medium text-xs">Most Common</span>
               </div>
-              <div className="text-base font-bold text-primary">{stats?.mostCommon.label}</div>
-              <div className="text-xs text-muted-foreground">
-                {stats?.mostCommon.percentage}% of entries
-              </div>
+              <div className="text-sm font-bold text-primary">{stats?.mostCommon.label}</div>
             </div>
           </div>
         </div>
