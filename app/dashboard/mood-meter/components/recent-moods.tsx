@@ -249,7 +249,7 @@ export function RecentMoods({
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 px-2 text-muted-foreground hover:text-foreground text-xs gap-1 min-w-0"
+                            className="h-8 p-0 text-muted-foreground hover:text-foreground hover:bg-transparent text-xs gap-1 min-w-0"
                           >
                             <span className="hidden sm:inline">Show Raw Data</span>
                             <span className="sm:hidden">Raw</span>
@@ -396,7 +396,7 @@ export function RecentMoods({
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 px-2 text-muted-foreground hover:text-red-600 text-xs min-w-0"
+                              className="h-8 p-0 text-muted-foreground hover:text-red-600 hover:bg-transparent text-xs min-w-0"
                               disabled={deletingEntryId === entry.id}
                             >
                               <Trash2 className="h-3 w-3" />
