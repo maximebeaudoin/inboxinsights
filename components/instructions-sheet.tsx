@@ -23,6 +23,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 
+import { APP_CONFIG } from '@/lib/config';
+
 import { useToast } from '@/hooks/use-toast';
 
 import { DataIngestionInfo } from './data-ingestion-info';
@@ -162,7 +164,7 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
                 <div className="space-y-1">
                   <Label className="text-xs font-medium">Demo Email:</Label>
                   <Input
-                    value="demo@example.com"
+                    value={APP_CONFIG.demo.email}
                     readOnly
                     className="text-xs h-8 cursor-pointer"
                     onClick={(e) => {
@@ -175,7 +177,7 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
                   <Label className="text-xs font-medium">Demo Password:</Label>
                   <Input
                     type="password"
-                    value="demopassword123"
+                    value={APP_CONFIG.demo.password}
                     readOnly
                     className="text-xs h-8 cursor-pointer"
                     onClick={(e) => {
@@ -200,7 +202,7 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
                 </Label>
                 <div className="flex gap-2">
                   <Input
-                    value="https://github.com/maximebeaudoin/inboxinsights"
+                    value={`${APP_CONFIG.app.author.github}/inboxinsights`}
                     readOnly
                     className="flex-1 text-xs h-8 cursor-pointer"
                     onClick={(e) => {
@@ -213,7 +215,7 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
                     size="icon"
                     variant="outline"
                     onClick={() =>
-                      window.open('https://github.com/maximebeaudoin/inboxinsights', '_blank')
+                      window.open(`${APP_CONFIG.app.author.github}/inboxinsights`, '_blank')
                     }
                     className="h-8 w-8 shrink-0"
                   >

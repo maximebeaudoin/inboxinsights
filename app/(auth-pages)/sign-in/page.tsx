@@ -1,8 +1,14 @@
+'use client';
+
+import { useState } from 'react';
+
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 import { AlertTriangle, BookOpen, Lock, Mail } from 'lucide-react';
 
 import { DataIngestionInfo } from '@/components/data-ingestion-info';
+import { DemoCredentialsButton } from '@/components/demo-credentials-button';
 import { FormMessage, Message } from '@/components/form-message';
 import { InstructionsSheet } from '@/components/instructions-sheet';
 import { SubmitButton } from '@/components/submit-button';
@@ -14,8 +20,27 @@ import { Label } from '@/components/ui/label';
 
 import { signInAction } from '@/app/actions';
 
-export default async function Login(props: { searchParams: Promise<Message> }) {
-  const searchParams = await props.searchParams;
+export default function Login() {
+  const searchParams = useSearchParams();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handlePopulateCredentials = (demoEmail: string, demoPassword: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+  };
+
+  // Convert searchParams to Message format for FormMessage component
+  const message: Message = {};
+  if (searchParams.get('message')) {
+    message.message = searchParams.get('message')!;
+  }
+  if (searchParams.get('error')) {
+    message.error = searchParams.get('error')!;
+  }
+  if (searchParams.get('success')) {
+    message.success = searchParams.get('success')!;
+  }
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-background to-muted/20">
       <div className="flex flex-col gap-6 max-w-6xl w-full">
@@ -61,6 +86,8 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                       name="email"
                       type="email"
                       placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                       className="transition-all focus:ring-2 focus:ring-primary/20"
                     />
@@ -83,6 +110,8 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                       name="password"
                       type="password"
                       placeholder="Your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required
                       className="transition-all focus:ring-2 focus:ring-primary/20"
                     />
@@ -94,7 +123,22 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                   >
                     Sign in
                   </SubmitButton>
-                  <FormMessage message={searchParams} />
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">Or</span>
+                    </div>
+                  </div>
+
+                  <DemoCredentialsButton
+                    onPopulateCredentials={handlePopulateCredentials}
+                    className="mt-2"
+                  />
+
+                  <FormMessage message={message} />
                 </form>
               </CardContent>
             </Card>

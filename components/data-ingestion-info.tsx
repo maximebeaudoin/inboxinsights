@@ -26,7 +26,30 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+import { APP_CONFIG } from '@/lib/config';
+
 import { useToast } from '@/hooks/use-toast';
+
+/**
+ * DataIngestionInfo Component
+ *
+ * A reusable component that displays instructions for sending mood data via email.
+ *
+ * Usage examples:
+ *
+ * // Full version with all instructions (default)
+ * <DataIngestionInfo />
+ * <DataIngestionInfo variant="default" />
+ *
+ * // Compact version for dashboards or sidebars
+ * <DataIngestionInfo variant="compact" />
+ *
+ * // Without title
+ * <DataIngestionInfo showTitle={false} />
+ *
+ * // With custom styling
+ * <DataIngestionInfo className="my-custom-class" variant="compact" />
+ */
 
 /**
  * DataIngestionInfo Component
@@ -95,7 +118,7 @@ export function DataIngestionInfo({
               Email Address:
             </Label>
             <Input
-              value="b82ba9d30ef2dd7cf65016dfe8c69b37@inbound.postmarkapp.com"
+              value={APP_CONFIG.dataIngestion.email}
               readOnly
               className="font-mono text-xs h-8 cursor-pointer"
               onClick={(e) => {
@@ -139,7 +162,7 @@ export function DataIngestionInfo({
               Send Data To:
             </Label>
             <Input
-              value="b82ba9d30ef2dd7cf65016dfe8c69b37@inbound.postmarkapp.com"
+              value={APP_CONFIG.dataIngestion.email}
               readOnly
               className="font-mono text-xs h-8 cursor-pointer"
               onClick={(e) => {
