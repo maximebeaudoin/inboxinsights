@@ -25,11 +25,31 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 
+import { useToast } from '@/hooks/use-toast';
+
 interface InstructionsSheetProps {
   children: React.ReactNode;
 }
 
 export function InstructionsSheet({ children }: InstructionsSheetProps) {
+  const { toast } = useToast();
+
+  const handleCopy = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: 'Copied!',
+        description: `${label} copied to clipboard`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Copy failed',
+        description: 'Unable to copy to clipboard',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -166,7 +186,7 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
                     className="text-xs h-8 cursor-pointer"
                     onClick={(e) => {
                       e.currentTarget.select();
-                      navigator.clipboard.writeText(e.currentTarget.value);
+                      handleCopy(e.currentTarget.value, 'Demo email');
                     }}
                   />
                 </div>
@@ -179,7 +199,7 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
                     className="text-xs h-8 cursor-pointer"
                     onClick={(e) => {
                       e.currentTarget.select();
-                      navigator.clipboard.writeText(e.currentTarget.value);
+                      handleCopy(e.currentTarget.value, 'Demo password');
                     }}
                   />
                 </div>
@@ -203,7 +223,7 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
                   className="font-mono text-xs h-8 cursor-pointer"
                   onClick={(e) => {
                     e.currentTarget.select();
-                    navigator.clipboard.writeText(e.currentTarget.value);
+                    handleCopy(e.currentTarget.value, 'Data ingestion email');
                   }}
                 />
                 <p className="text-xs text-blue-600 dark:text-blue-400">
@@ -230,7 +250,7 @@ export function InstructionsSheet({ children }: InstructionsSheetProps) {
                     className="flex-1 text-xs h-8 cursor-pointer"
                     onClick={(e) => {
                       e.currentTarget.select();
-                      navigator.clipboard.writeText(e.currentTarget.value);
+                      handleCopy(e.currentTarget.value, 'Repository URL');
                     }}
                   />
                   <Button
