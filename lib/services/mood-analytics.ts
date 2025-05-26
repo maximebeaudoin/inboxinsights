@@ -1,4 +1,4 @@
-import { endOfWeek, format, isSameDay, startOfWeek, subDays } from 'date-fns';
+import { format, isSameDay, startOfWeek, subDays } from 'date-fns';
 
 import type {
   AnalyticsConfig,
@@ -592,6 +592,29 @@ export class MoodAnalyticsService {
     const today = new Date();
     const todayEntry = entries.find((entry) => isSameDay(new Date(entry.created_at), today));
 
+    // Calculate best day this week
+    const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 0 }); // Start on Sunday
+    const thisWeekEntries = entries.filter((entry) => {
+      const entryDate = new Date(entry.created_at);
+      return entryDate >= startOfCurrentWeek && entryDate <= today;
+    });
+
+    let bestDayScore: number | undefined;
+    let bestDay: string | undefined;
+
+    if (thisWeekEntries.length > 0) {
+      const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      let highestScore = 0;
+
+      thisWeekEntries.forEach((entry) => {
+        if (entry.mood_score > highestScore) {
+          highestScore = entry.mood_score;
+          bestDayScore = entry.mood_score;
+          bestDay = weekdays[new Date(entry.created_at).getDay()];
+        }
+      });
+    }
+
     // Calculate energy trend
     const energyEntries = entries.filter((entry) => entry.energy_level);
     const recentEnergyEntries = energyEntries.filter(
@@ -673,8 +696,8 @@ export class MoodAnalyticsService {
       wellnessLevel: wellness.level,
       weeklyTrend: weeklyTrend?.direction || 'stable',
       todayMood: todayEntry?.mood_score,
-      bestDayScore: undefined, // Will be calculated if needed
-      bestDay: undefined, // Will be calculated if needed
+      bestDayScore,
+      bestDay,
       weeklyAverage: recentActivity.recentAverage > 0 ? recentActivity.recentAverage : undefined,
       morningAvg: timePatterns.morning.count > 0 ? timePatterns.morning.average : undefined,
       afternoonAvg: timePatterns.afternoon.count > 0 ? timePatterns.afternoon.average : undefined,
