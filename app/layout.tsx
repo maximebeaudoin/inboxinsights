@@ -70,6 +70,7 @@ export default async function RootLayout({
           </main>
           <Toaster />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
