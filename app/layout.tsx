@@ -1,5 +1,6 @@
 import { Geist } from 'next/font/google';
 
+import { Analytics } from '@vercel/analytics/next';
 import { ThemeProvider } from 'next-themes';
 
 import MainNav from '@/components/main-nav';

@@ -603,7 +603,15 @@ export class MoodAnalyticsService {
     let bestDay: string | undefined;
 
     if (thisWeekEntries.length > 0) {
-      const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const weekdays = [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+      ];
       let highestScore = 0;
 
       thisWeekEntries.forEach((entry) => {
